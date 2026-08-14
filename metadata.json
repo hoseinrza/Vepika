@@ -1,0 +1,6 @@
+{
+  "name": "وپیکا | رسانه آموزشی وردپرس و وب",
+  "description": "وپیکا (Vepika) — پلتفرم تخصصی و مستقل آموزش وردپرس، توسعه وب، المنتور، ووکامرس، سئو و ابزارهای وب به زبان فارسی. یاد بگیرید، بسازید، رشد کنید.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
