@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock, Eye, Heart, Bookmark, ArrowLeft, Sparkles, BookOpen, Layers } from 'lucide-react';
 import { Article, Category } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
+import { CoverImage } from './CoverImage';
 
 interface ArticleCardProps {
   article: Article;
@@ -49,12 +50,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
     >
       {/* Cover Image Container */}
       <div className="relative aspect-16/9 w-full bg-slate-100 overflow-hidden">
-        <img
+        <CoverImage
           src={article.coverImage}
           alt={article.coverImageAlt || article.title}
-          referrerPolicy="no-referrer"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
         />
 
         {/* Category Pill Over Image */}

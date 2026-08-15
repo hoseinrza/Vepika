@@ -29,6 +29,7 @@ import {
 import { Article, Category, Comment, SiteSettings } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
 import { SchemaInspectorModal } from './SchemaInspectorModal';
+import { CoverImage } from './CoverImage';
 
 interface ArticleViewProps {
   article: Article;
@@ -399,10 +400,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
         {/* Featured Cover Image */}
         <div className="aspect-16/9 w-full rounded-3xl overflow-hidden border border-slate-200 shadow-lg mb-10 bg-slate-100">
-          <img
+          <CoverImage
             src={article.coverImage}
             alt={article.coverImageAlt || article.title}
-            referrerPolicy="no-referrer"
             className="w-full h-full object-cover"
           />
         </div>
@@ -636,10 +636,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   onClick={() => onSelectArticle(rel)}
                   className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-blue-500 transition-all cursor-pointer flex gap-4 group shadow-2xs"
                 >
-                  <img
+                  <CoverImage
                     src={rel.coverImage}
                     alt={rel.title}
-                    referrerPolicy="no-referrer"
                     className="w-24 h-24 rounded-xl object-cover shrink-0"
                   />
                   <div className="space-y-2 flex-1 flex flex-col justify-between">

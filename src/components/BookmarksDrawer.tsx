@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Bookmark, Trash2, ArrowLeft, Clock } from 'lucide-react';
 import { Article, Category } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
+import { CoverImage } from './CoverImage';
 
 interface BookmarksDrawerProps {
   isOpen: boolean;
@@ -73,10 +74,9 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                     key={article.id}
                     className="p-3 bg-slate-50 rounded-2xl border border-slate-200 hover:border-blue-500 transition-all flex gap-3 group shadow-2xs"
                   >
-                    <img
+                    <CoverImage
                       src={article.coverImage}
                       alt={article.title}
-                      referrerPolicy="no-referrer"
                       className="w-16 h-16 rounded-xl object-cover shrink-0 cursor-pointer"
                       onClick={() => {
                         onSelectArticle(article);
