@@ -10,7 +10,6 @@ import {
   Layers,
   Sparkles,
   Sliders,
-  ShieldCheck,
   ArrowLeft,
   Flame,
   Code2,
@@ -26,7 +25,6 @@ interface HeaderProps {
   onOpenSearch: () => void;
   bookmarkedCount: number;
   onToggleBookmarksDrawer: () => void;
-  pendingCommentsCount: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,7 +36,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSearch,
   bookmarkedCount,
   onToggleBookmarksDrawer,
-  pendingCommentsCount,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -286,21 +283,6 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </button>
 
-            {/* Admin Dashboard CTA */}
-            <button
-              onClick={() => onNavigate('admin')}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-red-600 text-white rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs hover:shadow-red-600/20 whitespace-nowrap"
-              title="پیشخوان مدیریت"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
-              <span>پیشخوان مدیریت</span>
-              {pendingCommentsCount > 0 && (
-                <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full text-[10px] font-bold">
-                  {pendingCommentsCount}
-                </span>
-              )}
-            </button>
-
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -392,24 +374,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md">
               UI Kit
             </span>
-          </button>
-
-          <button
-            onClick={() => {
-              onNavigate('admin');
-              setIsMobileMenuOpen(false);
-            }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-red-600 transition-colors flex items-center justify-between mt-2 shadow-sm whitespace-nowrap"
-          >
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-red-400" />
-              <span>ورود به پیشخوان مدیریت</span>
-            </div>
-            {pendingCommentsCount > 0 && (
-              <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-md text-[10px] font-bold">
-                {pendingCommentsCount}
-              </span>
-            )}
           </button>
         </div>
       )}

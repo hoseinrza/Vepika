@@ -8,6 +8,39 @@ import { Article } from '../../src/types';
 
 export const articlesRouter = Router();
 
+const clearOtherFeatured = db.prepare('UPDATE articles SET featured = 0 WHERE id != ?');
+const insertArticleStmt = db.prepare(`
+  INSERT INTO articles (
+    id, slug, title, content, excerpt, coverImage, coverImageAlt, author, categoryId,
+    tags, readingTimeMinutes, publishDate, updatedAt, status, viewsCount, likesCount,
+    featured, contentType, difficulty, prerequisites, tutorialSteps, seo, wpLevel, wpPlugin, wpVersion
+  ) VALUES (
+    @id, @slug, @title, @content, @excerpt, @coverImage, @coverImageAlt, @author, @categoryId,
+    @tags, @readingTimeMinutes, @publishDate, @updatedAt, @status, @viewsCount, @likesCount,
+    @featured, @contentType, @difficulty, @prerequisites, @tutorialSteps, @seo, @wpLevel, @wpPlugin, @wpVersion
+  )
+`);
+const updateArticleStmt = db.prepare(`
+  UPDATE articles SET
+    slug=@slug, title=@title, content=@content, excerpt=@excerpt, coverImage=@coverImage,
+    coverImageAlt=@coverImageAlt, author=@author, categoryId=@categoryId, tags=@tags,
+    readingTimeMinutes=@readingTimeMinutes, publishDate=@publishDate, updatedAt=@updatedAt,
+    status=@status, viewsCount=@viewsCount, likesCount=@likesCount, featured=@featured,
+    contentType=@contentType, difficulty=@difficulty, prerequisites=@prerequisites,
+    tutorialSteps=@tutorialSteps, seo=@seo, wpLevel=@wpLevel, wpPlugin=@wpPlugin, wpVersion=@wpVersion
+  WHERE id=@id
+`);
+
+// Only one article can be "the" hero/featured article at a time.
+const insertArticle = db.transaction((article: Article) => {
+  insertArticleStmt.run(articleToRow(article));
+  if (article.featured) clearOtherFeatured.run(article.id);
+});
+const updateArticle = db.transaction((article: Article) => {
+  updateArticleStmt.run(articleToRow(article));
+  if (article.featured) clearOtherFeatured.run(article.id);
+});
+
 articlesRouter.get('/', (req, res) => {
   const wantsAll = req.query.all === '1' && !!getSessionUsername(req);
   const rows = wantsAll
@@ -45,17 +78,7 @@ articlesRouter.post('/', requireAuth, (req, res) => {
     likesCount: 0,
   };
 
-  db.prepare(`
-    INSERT INTO articles (
-      id, slug, title, content, excerpt, coverImage, coverImageAlt, author, categoryId,
-      tags, readingTimeMinutes, publishDate, updatedAt, status, viewsCount, likesCount,
-      featured, contentType, difficulty, prerequisites, tutorialSteps, seo, wpLevel, wpPlugin, wpVersion
-    ) VALUES (
-      @id, @slug, @title, @content, @excerpt, @coverImage, @coverImageAlt, @author, @categoryId,
-      @tags, @readingTimeMinutes, @publishDate, @updatedAt, @status, @viewsCount, @likesCount,
-      @featured, @contentType, @difficulty, @prerequisites, @tutorialSteps, @seo, @wpLevel, @wpPlugin, @wpVersion
-    )
-  `).run(articleToRow(article));
+  insertArticle(article);
 
   res.status(201).json(article);
 });
@@ -78,16 +101,7 @@ articlesRouter.put('/:id', requireAuth, (req, res) => {
     updatedAt: new Date().toISOString(),
   };
 
-  db.prepare(`
-    UPDATE articles SET
-      slug=@slug, title=@title, content=@content, excerpt=@excerpt, coverImage=@coverImage,
-      coverImageAlt=@coverImageAlt, author=@author, categoryId=@categoryId, tags=@tags,
-      readingTimeMinutes=@readingTimeMinutes, publishDate=@publishDate, updatedAt=@updatedAt,
-      status=@status, viewsCount=@viewsCount, likesCount=@likesCount, featured=@featured,
-      contentType=@contentType, difficulty=@difficulty, prerequisites=@prerequisites,
-      tutorialSteps=@tutorialSteps, seo=@seo, wpLevel=@wpLevel, wpPlugin=@wpPlugin, wpVersion=@wpVersion
-    WHERE id=@id
-  `).run(articleToRow(article));
+  updateArticle(article);
 
   res.json(article);
 });
@@ -116,19 +130,10 @@ articlesRouter.post('/:id/duplicate', requireAuth, (req, res) => {
     updatedAt: now,
     viewsCount: 0,
     likesCount: 0,
+    featured: false, // a draft copy should never silently take over the hero slot
   };
 
-  db.prepare(`
-    INSERT INTO articles (
-      id, slug, title, content, excerpt, coverImage, coverImageAlt, author, categoryId,
-      tags, readingTimeMinutes, publishDate, updatedAt, status, viewsCount, likesCount,
-      featured, contentType, difficulty, prerequisites, tutorialSteps, seo, wpLevel, wpPlugin, wpVersion
-    ) VALUES (
-      @id, @slug, @title, @content, @excerpt, @coverImage, @coverImageAlt, @author, @categoryId,
-      @tags, @readingTimeMinutes, @publishDate, @updatedAt, @status, @viewsCount, @likesCount,
-      @featured, @contentType, @difficulty, @prerequisites, @tutorialSteps, @seo, @wpLevel, @wpPlugin, @wpVersion
-    )
-  `).run(articleToRow(duplicate));
+  insertArticleStmt.run(articleToRow(duplicate));
 
   res.status(201).json(duplicate);
 });
@@ -146,6 +151,24 @@ articlesRouter.patch('/:id/status', requireAuth, (req, res) => {
     req.params.id
   );
   res.json({ status: nextStatus });
+});
+
+// Sets/unsets this article as THE hero article shown in the homepage spotlight.
+// Setting one clears the flag on every other article — there's only ever one.
+articlesRouter.patch('/:id/feature', requireAuth, (req, res) => {
+  const existing = db.prepare('SELECT id, featured FROM articles WHERE id = ?').get(req.params.id) as
+    | { id: string; featured: number }
+    | undefined;
+  if (!existing) return res.status(404).json({ error: 'مقاله یافت نشد' });
+
+  const nextFeatured = existing.featured ? 0 : 1;
+  const setFeatured = db.transaction(() => {
+    if (nextFeatured) clearOtherFeatured.run(req.params.id);
+    db.prepare('UPDATE articles SET featured = ? WHERE id = ?').run(nextFeatured, req.params.id);
+  });
+  setFeatured();
+
+  res.json({ featured: !!nextFeatured });
 });
 
 articlesRouter.post('/:id/view', (req, res) => {

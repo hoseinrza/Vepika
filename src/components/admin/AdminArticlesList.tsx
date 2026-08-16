@@ -13,6 +13,7 @@ import {
   Eye,
   AlertCircle,
   Filter,
+  Star,
 } from 'lucide-react';
 import { Article, Category } from '../../types';
 import { analyzeArticleSeo, formatPersianDate, toPersianDigits } from '../../utils/seoAnalyzer';
@@ -25,6 +26,7 @@ interface AdminArticlesListProps {
   onDeleteArticle: (id: string) => void;
   onDuplicateArticle: (article: Article) => void;
   onToggleStatus: (id: string) => void;
+  onSetFeatured: (id: string) => void;
   onViewLive: (article: Article) => void;
 }
 
@@ -36,6 +38,7 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
   onDeleteArticle,
   onDuplicateArticle,
   onToggleStatus,
+  onSetFeatured,
   onViewLive,
 }) => {
   const [search, setSearch] = useState('');
@@ -181,9 +184,12 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                           <div>
                             <span
                               onClick={() => onEditArticle(art)}
-                              className="font-lalezar text-base text-stone-900 hover:text-amber-600 transition-colors cursor-pointer block line-clamp-1"
+                              className="font-lalezar text-base text-stone-900 hover:text-amber-600 transition-colors cursor-pointer flex items-center gap-1.5 line-clamp-1"
                             >
-                              {art.title}
+                              {art.featured && (
+                                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                              )}
+                              <span className="line-clamp-1">{art.title}</span>
                             </span>
                             <span className="text-[11px] text-stone-400 block mt-0.5">
                               {formatPersianDate(art.publishDate)} • {art.slug}
@@ -245,6 +251,19 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-left">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Set as Hero Article */}
+                          <button
+                            onClick={() => onSetFeatured(art.id)}
+                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                              art.featured
+                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                                : 'text-stone-400 hover:text-amber-600 hover:bg-amber-50'
+                            }`}
+                            title={art.featured ? 'حذف از حالت مقاله ویژه هیرو' : 'انتخاب به عنوان مقاله ویژه هیرو صفحه اصلی'}
+                          >
+                            <Star className={`w-4 h-4 ${art.featured ? 'fill-amber-500' : ''}`} />
+                          </button>
+
                           {/* Live View */}
                           <button
                             onClick={() => onViewLive(art)}

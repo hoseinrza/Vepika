@@ -38,6 +38,7 @@ interface AdminLayoutProps {
   onDeleteArticle: (id: string) => void;
   onDuplicateArticle: (article: Article) => void;
   onToggleArticleStatus: (id: string) => void;
+  onSetFeaturedArticle: (id: string) => void;
   onViewLiveArticle: (article: Article) => void;
   onUpdateCommentStatus: (commentId: string, status: any) => void;
   onDeleteComment: (commentId: string) => void;
@@ -62,6 +63,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onDeleteArticle,
   onDuplicateArticle,
   onToggleArticleStatus,
+  onSetFeaturedArticle,
   onViewLiveArticle,
   onUpdateCommentStatus,
   onDeleteComment,
@@ -205,6 +207,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             onDeleteArticle={onDeleteArticle}
             onDuplicateArticle={onDuplicateArticle}
             onToggleStatus={onToggleArticleStatus}
+            onSetFeatured={onSetFeaturedArticle}
             onViewLive={onViewLiveArticle}
           />
         )}

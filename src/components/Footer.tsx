@@ -4,7 +4,6 @@ import {
   Heart,
   CheckCircle2,
   Send,
-  ShieldCheck,
   Code2,
   ArrowUp,
   Wrench,
@@ -26,7 +25,6 @@ interface FooterProps {
   categories: Category[];
   settings: SiteSettings;
   onSelectCategory: (id: string | null) => void;
-  onOpenAdmin: () => void;
   onOpenToolkit?: () => void;
   onOpenDesignSystem?: () => void;
 }
@@ -35,7 +33,6 @@ export const Footer: React.FC<FooterProps> = ({
   categories,
   settings,
   onSelectCategory,
-  onOpenAdmin,
   onOpenToolkit,
   onOpenDesignSystem,
 }) => {
@@ -196,16 +193,6 @@ export const Footer: React.FC<FooterProps> = ({
                   </button>
                 </li>
               )}
-              <li>
-                <button
-                  onClick={onOpenAdmin}
-                  className="hover:text-red-400 transition-colors flex items-center gap-2 cursor-pointer group"
-                  id="footer-admin-link"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <span>پیشخوان مدیریت محتوا</span>
-                </button>
-              </li>
             </ul>
           </div>
 

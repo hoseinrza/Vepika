@@ -576,7 +576,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                       onChange={(e) => setFeatured(e.target.checked)}
                       className="w-4 h-4 text-amber-500 rounded border-stone-300 focus:ring-amber-400"
                     />
-                    <span>نمایش به عنوان مقاله ویژه صفحه نخست</span>
+                    <span>انتخاب به‌عنوان مقاله ویژه هیرو صفحه اصلی (فقط یک مقاله می‌تواند ویژه باشد)</span>
                   </label>
                 </div>
               </div>

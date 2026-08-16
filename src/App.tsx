@@ -17,6 +17,10 @@ import { generateArticleSchema, generateWebsiteSchema } from './utils/schemaGene
 
 type AuthState = 'checking' | 'authed' | 'anon';
 
+// Admin panel has no visible link anywhere on the public site — this direct
+// URL is the only way in. Keep it out of docs shared publicly.
+const ADMIN_SECRET_PATH = '/panel-rw2026';
+
 export function App() {
   // Server-backed content state
   const [articles, setArticles] = useState<Article[]>([]);
@@ -33,7 +37,9 @@ export function App() {
   });
 
   // Navigation & View state
-  const [viewMode, setViewMode] = useState<ViewMode>('home');
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    typeof window !== 'undefined' && window.location.pathname === ADMIN_SECRET_PATH ? 'admin' : 'home'
+  );
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
@@ -207,6 +213,11 @@ export function App() {
     setArticles((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
   };
 
+  const handleSetFeaturedArticle = async (id: string) => {
+    const { featured } = await api.patch(`/articles/${id}/feature`);
+    setArticles((prev) => prev.map((a) => ({ ...a, featured: a.id === id ? featured : false })));
+  };
+
   const handleUpdateCommentStatus = async (commentId: string, status: any) => {
     await api.patch(`/comments/${commentId}/status`, { status });
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, status } : c)));
@@ -277,7 +288,6 @@ export function App() {
     : [];
 
   const bookmarkedArticlesList = articles.filter((a) => bookmarks.includes(a.id));
-  const pendingCommentsCount = comments.filter((c) => c.status === 'pending').length;
 
   const selectedCategoryObj = selectedCategoryId
     ? categories.find((c) => c.id === selectedCategoryId) || null
@@ -331,6 +341,7 @@ export function App() {
         onDeleteArticle={handleDeleteArticle}
         onDuplicateArticle={handleDuplicateArticle}
         onToggleArticleStatus={handleToggleArticleStatus}
+        onSetFeaturedArticle={handleSetFeaturedArticle}
         onViewLiveArticle={(art) => {
           setSelectedArticleId(art.id);
           setViewMode('article');
@@ -368,7 +379,6 @@ export function App() {
         onOpenSearch={() => setIsSearchOpen(true)}
         bookmarkedCount={bookmarks.length}
         onToggleBookmarksDrawer={() => setIsBookmarksOpen(true)}
-        pendingCommentsCount={pendingCommentsCount}
       />
 
       {/* Main Content Area */}
@@ -440,10 +450,6 @@ export function App() {
         categories={categories}
         settings={settings}
         onSelectCategory={handleSelectCategory}
-        onOpenAdmin={() => {
-          setAdminTab('dashboard');
-          setViewMode('admin');
-        }}
         onOpenToolkit={() => {
           setViewMode('toolkit');
           window.scrollTo({ top: 0, behavior: 'smooth' });
