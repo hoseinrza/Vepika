@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Article, Category, SiteSettings } from '../types';
 import { ArticleCard } from './ArticleCard';
-import { toPersianDigits } from '../utils/seoAnalyzer';
+import { toPersianDigits, formatPersianDate } from '../utils/seoAnalyzer';
 import {
   Sparkles,
   ArrowLeft,
@@ -20,7 +20,8 @@ import {
   Search,
   CheckCircle2,
   Bookmark,
-  ExternalLink,
+  Check,
+  Code2,
 } from 'lucide-react';
 
 interface HomeViewProps {
@@ -30,7 +31,7 @@ interface HomeViewProps {
   bookmarks: string[];
   onSelectArticle: (article: Article) => void;
   onSelectCategory: (catId: string) => void;
-  onToggleBookmark: (articleId: string) => void;
+  onToggleBookmark: (articleId: string, e?: React.MouseEvent) => void;
   onOpenSearch: () => void;
   onOpenToolkit: () => void;
 }
@@ -59,9 +60,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
     if (contentTypeFilter === 'all') return true;
     return a.contentType === contentTypeFilter;
   });
-
-  // Popular articles (sorted by views/likes)
-  const popularArticles = [...publishedArticles].sort((a, b) => b.viewsCount - a.viewsCount).slice(0, 4);
 
   // Category icon helper
   const getCategoryIcon = (slug: string) => {
@@ -98,152 +96,186 @@ export const HomeView: React.FC<HomeViewProps> = ({
     }
   };
 
+  const scrollToCategories = () => {
+    const el = document.getElementById('categories-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const isFeaturedBookmarked = featuredArticle ? bookmarks.includes(featuredArticle.id) : false;
+
   return (
     <div className="space-y-16 pb-16" dir="rtl">
-      {/* 1. Hero Section */}
-      <section className="relative bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-white pt-12 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-800">
+      {/* 1. Balanced 2-Column Clean Hero Section */}
+      <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white py-12 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-800/80">
         {/* Subtle geometric glowing background accents */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-          {/* Header Typography */}
-          <div className="max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-bold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>پلتفرم تخصصی و مستقل آموزش وردپرس و توسعه وب</span>
-            </div>
-
-            <h1 className="font-lalezar text-3xl sm:text-5xl lg:text-6xl tracking-wide leading-tight sm:leading-none text-white">
-              یاد بگیرید. بسازید. <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-purple-400">رشد کنید.</span>
-            </h1>
-
-            <p className="text-slate-300 text-sm sm:text-base lg:text-lg leading-relaxed text-justify sm:text-right">
-              رسانه مستقل <strong className="text-white font-bold">وپیکا (Vepika)</strong>؛ مرجع انتشار مقالات عمیق، آموزش‌های گام‌به‌گام وردپرس، ووکامرس، المنتور، سئو تکنیکال، معماری وب و ابزارهای کاربردی کدنویسی.
-            </p>
-
-            {/* Quick search input trigger */}
-            <div className="pt-2">
-              <div
-                onClick={onOpenSearch}
-                className="flex items-center gap-3 p-3 sm:p-3.5 bg-slate-800/90 hover:bg-slate-800 rounded-2xl border border-slate-700 hover:border-blue-500/50 shadow-xl cursor-pointer transition-all max-w-xl group"
-              >
-                <Search className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs sm:text-sm text-slate-400 flex-1">
-                  جستجو در بین مقالات، اسنیپت‌ها، رفع خطاها و افزونه‌ها...
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Right Column (Col 6/12): Punchy Brand Message & Action Buttons */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs font-bold">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                 </span>
-                <span className="hidden sm:inline-block px-2.5 py-1 text-[11px] font-mono bg-slate-900 text-slate-400 rounded-lg border border-slate-700">
-                  Ctrl + K
-                </span>
+                <span>رسانه تخصصی آموزش وردپرس و توسعه مدرن وب</span>
               </div>
 
-              {/* Hot topic tags */}
-              <div className="flex flex-wrap items-center gap-2 pt-3 text-xs text-slate-400">
-                <span className="font-bold text-slate-300">مباحث پرطرفدار:</span>
-                {[
-                  { label: 'افزایش سرعت وردپرس', catId: 'cat-wordpress' },
-                  { label: 'کانتینر فلکس‌باکس المنتور', catId: 'cat-elementor' },
-                  { label: 'سئو تکنیکال و اسکیما', catId: 'cat-seo' },
-                  { label: 'اسنیپت‌های functions.php', catId: 'cat-web-dev' },
-                  { label: 'تسویه حساب ووکامرس', catId: 'cat-woocommerce' },
-                ].map((tag, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => onSelectCategory(tag.catId)}
-                    className="hover:text-blue-400 bg-slate-800/60 hover:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700/80 transition-colors cursor-pointer text-[11px]"
-                  >
-                    #{tag.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+              <div className="space-y-3">
+                <h1 className="font-lalezar text-3xl sm:text-5xl lg:text-5xl tracking-wide leading-tight text-white">
+                  یاد بگیرید. بسازید. <span className="text-transparent bg-clip-text bg-gradient-to-l from-blue-400 to-purple-400">ارتقا دهید.</span>
+                </h1>
 
-          {/* Featured Spotlight Article Card */}
-          {featuredArticle && (
-            <div className="bg-slate-800/90 rounded-3xl border border-slate-700/90 overflow-hidden shadow-2xl hover:border-blue-500/50 transition-all duration-300">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
-                {/* Media Column */}
-                <div className="lg:col-span-7 h-64 sm:h-80 lg:h-auto min-h-[340px] relative overflow-hidden bg-slate-900 group">
-                  <img
-                    src={featuredArticle.coverImage}
-                    alt={featuredArticle.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent lg:hidden" />
-                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>آموزش برگزیده وپیکا</span>
-                  </div>
-                  {featuredArticle.difficulty && (
-                    <div className="absolute bottom-4 right-4 bg-slate-900/90 backdrop-blur-md text-slate-200 px-3 py-1 rounded-xl text-xs font-bold border border-slate-700">
-                      سطح: {featuredArticle.difficulty === 'intermediate' ? 'متوسط' : featuredArticle.difficulty === 'beginner' ? 'مقدماتی' : 'پیشرفته'}
-                    </div>
-                  )}
+                <p className="text-slate-300 text-sm sm:text-base leading-relaxed text-justify max-w-xl">
+                  پایگاه تخصصی مقالات عمیق، آموزش‌های پروژه‌محور وردپرس، ووکامرس، المنتور، بهینه‌سازی سرعت، سئو تکنیکال و جعبه‌ابزار کدهای کاربردی برای مهندسان و طراحان وب فارسی.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  onClick={scrollToCategories}
+                  className="px-5 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-blue-600/20 hover:scale-[1.02] transform-gpu"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>مرور سرفصل‌ها و آموزش‌ها</span>
+                </button>
+
+                <button
+                  onClick={onOpenToolkit}
+                  className="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer border border-slate-700/80 shadow-md hover:border-blue-500/50"
+                >
+                  <Code2 className="w-4 h-4 text-blue-400" />
+                  <span>جعبه‌ابزار کدهای وردپرس</span>
+                  <span className="bg-blue-500/20 text-blue-300 text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold">
+                    PRO
+                  </span>
+                </button>
+              </div>
+
+              {/* Trust & Quality Badges */}
+              <div className="flex flex-wrap items-center gap-2.5 pt-3 text-xs text-slate-400">
+                <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1 rounded-xl border border-slate-800 text-emerald-400">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>۱۰۰٪ رایگان و کاربردی</span>
                 </div>
+                <div className="flex items-center gap-1.5 bg-slate-900/80 px-3 py-1 rounded-xl border border-slate-800 text-slate-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                  <span>سازگار با WP 6.7+ و PHP 8.x</span>
+                </div>
+              </div>
+            </div>
 
-                {/* Content Details Column */}
-                <div className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      <span className="bg-blue-500/20 text-blue-300 px-3 py-1 rounded-lg font-bold border border-blue-500/30">
+            {/* Left Column (Col 6/12): Spotlight Featured Article Card */}
+            {featuredArticle && (
+              <div className="lg:col-span-6">
+                <div className="bg-slate-900/90 rounded-3xl border border-slate-800/90 hover:border-blue-500/50 transition-all duration-300 overflow-hidden shadow-2xl shadow-slate-950/50 group flex flex-col">
+                  {/* Card Cover */}
+                  <div
+                    className="relative aspect-16/9 w-full bg-slate-950 overflow-hidden cursor-pointer"
+                    onClick={() => onSelectArticle(featuredArticle)}
+                  >
+                    <img
+                      src={featuredArticle.coverImage}
+                      alt={featuredArticle.title}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                    />
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+
+                    {/* Spotlight Badge */}
+                    <div className="absolute top-3.5 right-3.5 z-10 flex items-center gap-2">
+                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>آموزش ویژه وپیکا</span>
+                      </span>
+                    </div>
+
+                    {/* Bookmark Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleBookmark(featuredArticle.id, e);
+                      }}
+                      className={`absolute top-3.5 left-3.5 z-10 w-9 h-9 rounded-2xl flex items-center justify-center backdrop-blur-md transition-all cursor-pointer shadow-md ${
+                        isFeaturedBookmarked
+                          ? 'bg-blue-600 text-white scale-105'
+                          : 'bg-slate-900/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-700'
+                      }`}
+                      title={isFeaturedBookmarked ? 'حذف از نشان‌ها' : 'نشان کردن مقاله'}
+                    >
+                      <Bookmark className={`w-4 h-4 ${isFeaturedBookmarked ? 'fill-white' : ''}`} />
+                    </button>
+
+                    {/* Floating Meta on Image */}
+                    <div className="absolute bottom-3.5 right-3.5 left-3.5 z-10 flex items-center justify-between text-xs text-slate-300">
+                      <span className="bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-700 font-bold text-blue-300">
                         {categories.find((c) => c.id === featuredArticle.categoryId)?.name || 'وردپرس'}
                       </span>
-                      <span className="text-slate-500">•</span>
-                      <span className="flex items-center gap-1 text-slate-400">
-                        <Clock className="w-3.5 h-3.5" />
+                      <span className="flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-700">
+                        <Clock className="w-3.5 h-3.5 text-blue-400" />
                         <span>{toPersianDigits(featuredArticle.readingTimeMinutes)} دقیقه مطالعه</span>
                       </span>
                     </div>
+                  </div>
 
+                  {/* Card Body */}
+                  <div className="p-5 sm:p-6 space-y-4">
                     <h2
                       onClick={() => onSelectArticle(featuredArticle)}
-                      className="font-lalezar text-2xl sm:text-3xl lg:text-4xl text-white hover:text-blue-400 transition-colors cursor-pointer leading-snug tracking-wide"
+                      className="font-lalezar text-xl sm:text-2xl text-white group-hover:text-blue-400 transition-colors cursor-pointer leading-snug tracking-wide line-clamp-2"
                     >
                       {featuredArticle.title}
                     </h2>
 
-                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed line-clamp-3 text-justify">
+                    <p className="text-slate-400 text-xs sm:text-sm leading-relaxed line-clamp-2 text-justify">
                       {featuredArticle.excerpt}
                     </p>
-                  </div>
 
-                  <div className="pt-4 border-t border-slate-700/80 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <img
-                        src={featuredArticle.author.avatar}
-                        alt={featuredArticle.author.name}
-                        referrerPolicy="no-referrer"
-                        className="w-9 h-9 rounded-full object-cover border border-slate-600"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs font-bold text-white">
-                          {featuredArticle.author.name}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {featuredArticle.author.role}
-                        </span>
+                    <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src={featuredArticle.author.avatar}
+                          alt={featuredArticle.author.name}
+                          referrerPolicy="no-referrer"
+                          className="w-8 h-8 rounded-full object-cover border border-slate-700"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white">
+                            {featuredArticle.author.name}
+                          </span>
+                          <span className="text-[10px] text-slate-400">
+                            {featuredArticle.author.role}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      onClick={() => onSelectArticle(featuredArticle)}
-                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-blue-600/30"
-                    >
-                      <span>شروع آموزش</span>
-                      <ArrowLeft className="w-4 h-4" />
-                    </button>
+                      <button
+                        onClick={() => onSelectArticle(featuredArticle)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md hover:shadow-blue-600/30"
+                      >
+                        <span>شروع مطالعه</span>
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+          </div>
         </div>
       </section>
 
       {/* 2. Interactive 10 Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section id="categories-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 scroll-mt-24">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-blue-600 font-bold text-xs">

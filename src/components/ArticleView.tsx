@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ArrowRight,
   Clock,
@@ -25,6 +25,8 @@ import {
   AlertTriangle,
   Info,
   ArrowLeft,
+  FileText,
+  Zap,
 } from 'lucide-react';
 import { Article, Category, Comment, SiteSettings } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
@@ -144,6 +146,33 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   // Filter approved comments for this post
   const postComments = comments.filter((c) => c.postId === article.id && c.status === 'approved');
+
+  // Calculate real-time reading time and word count based on Persian text content
+  const readingStats = useMemo(() => {
+    // Strip markdown tags and special characters to count actual readable words
+    const plainText = (article.content || '')
+      .replace(/```[\s\S]*?```/g, '') // remove code blocks
+      .replace(/`.*?`/g, '') // inline code
+      .replace(/[#*`_~>\-\[\]\(\)]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const words = plainText ? plainText.split(/\s+/).filter(Boolean) : [];
+    const wordCount = words.length;
+    
+    // Average Persian reading speed: ~200 - 250 words per minute
+    // Plus a small bonus time for code snippets if any
+    const codeBlocksCount = (article.content.match(/```/g) || []).length / 2;
+    const calculatedMinutes = Math.max(1, Math.ceil(wordCount / 200) + Math.round(codeBlocksCount * 0.5));
+    
+    // Use calculated reading time, or fallback to article.readingTimeMinutes if content is brief
+    const readingTime = calculatedMinutes || article.readingTimeMinutes || 3;
+
+    return {
+      wordCount,
+      readingTime,
+    };
+  }, [article.content, article.readingTimeMinutes]);
 
   // Extract table of contents from markdown headings
   const extractHeadings = (content: string) => {
@@ -356,6 +385,16 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 {article.wpPlugin}
               </span>
             )}
+
+            {/* Dynamic Calculated Reading Time Pill */}
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50/90 text-blue-700 border border-blue-200/90 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+              <span>زمان تخمینی مطالعه: {toPersianDigits(readingStats.readingTime)} دقیقه</span>
+              <span className="text-blue-300">|</span>
+              <span className="text-[11px] font-medium text-blue-600">
+                ({toPersianDigits(readingStats.wordCount)} کلمه)
+              </span>
+            </span>
           </div>
 
           <h1 className="font-lalezar text-2xl sm:text-4xl lg:text-5xl text-slate-900 leading-snug tracking-wide">
@@ -381,10 +420,15 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-xs text-slate-500">
+            <div className="flex items-center gap-3 sm:gap-4 text-xs text-slate-500">
+              <span className="flex items-center gap-1 text-slate-700 font-medium">
+                <Clock className="w-4 h-4 text-blue-600" />
+                <span>{toPersianDigits(readingStats.readingTime)} دقیقه مطالعه</span>
+              </span>
+              <span>•</span>
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-slate-400" />
-                <span>{toPersianDigits(article.readingTimeMinutes)} دقیقه مطالعه</span>
+                <FileText className="w-4 h-4 text-slate-400" />
+                <span>{toPersianDigits(readingStats.wordCount)} کلمه</span>
               </span>
               <span>•</span>
               <span>انتشار: {formatPersianDate(article.publishDate)}</span>
