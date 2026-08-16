@@ -14,6 +14,7 @@ import {
   Share2,
   Copy,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 import { SiteSettings, Article, Category, Comment } from '../../types';
 import { generateSitemapXml, generateRobotsTxt, generateWebsiteSchema } from '../../utils/schemaGenerator';
@@ -23,7 +24,7 @@ interface AdminSeoSettingsProps {
   articles: Article[];
   categories: Category[];
   comments: Comment[];
-  onSaveSettings: (settings: SiteSettings) => void;
+  onSaveSettings: (settings: SiteSettings) => Promise<void>;
   onImportData: (data: { articles?: Article[]; categories?: Category[]; comments?: Comment[]; settings?: SiteSettings }) => Promise<void>;
 }
 
@@ -37,14 +38,24 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
 }) => {
   const [formData, setFormData] = useState<SiteSettings>(settings);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [copiedSitemap, setCopiedSitemap] = useState(false);
   const [copiedRobots, setCopiedRobots] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSaveSettings(formData);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+    setSaveError('');
+    setIsSaving(true);
+    try {
+      await onSaveSettings(formData);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (err: any) {
+      setSaveError(err?.message || 'ذخیره تنظیمات ناموفق بود.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Export full JSON backup (server streams the current DB content)
@@ -93,10 +104,11 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
 
         <button
           onClick={handleSubmit}
-          className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 rounded-xl font-lalezar text-base flex items-center gap-2 transition-all shadow-xs cursor-pointer"
+          disabled={isSaving}
+          className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 disabled:cursor-not-allowed text-stone-950 rounded-xl font-lalezar text-base flex items-center gap-2 transition-all shadow-xs cursor-pointer"
         >
           <Save className="w-4 h-4" />
-          <span>ذخیره تنظیمات</span>
+          <span>{isSaving ? 'در حال ذخیره...' : 'ذخیره تنظیمات'}</span>
         </button>
       </div>
 
@@ -104,6 +116,13 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
         <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-xl text-sm font-bold flex items-center gap-2 animate-in fade-in">
           <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           <span>تنظیمات با موفقیت ذخیره شد و اعمال گردید.</span>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="p-4 bg-red-50 border border-red-300 text-red-800 rounded-xl text-sm font-bold flex items-center gap-2 animate-in fade-in">
+          <AlertCircle className="w-5 h-5 text-red-600" />
+          <span>{saveError}</span>
         </div>
       )}
 

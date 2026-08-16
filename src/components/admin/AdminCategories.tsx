@@ -15,8 +15,8 @@ import { toPersianDigits } from '../../utils/seoAnalyzer';
 interface AdminCategoriesProps {
   categories: Category[];
   articles: Article[];
-  onSaveCategory: (category: Category) => void;
-  onDeleteCategory: (categoryId: string) => void;
+  onSaveCategory: (category: Category) => Promise<void>;
+  onDeleteCategory: (categoryId: string) => Promise<void>;
 }
 
 export const AdminCategories: React.FC<AdminCategoriesProps> = ({
@@ -27,6 +27,7 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
@@ -52,7 +53,7 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
     setIsCreating(false);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
@@ -72,9 +73,16 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
       color,
     };
 
-    onSaveCategory(catToSave);
-    setIsCreating(false);
-    setEditingId(null);
+    setIsSaving(true);
+    try {
+      await onSaveCategory(catToSave);
+      setIsCreating(false);
+      setEditingId(null);
+    } catch (err: any) {
+      alert(err?.message || '\u0630\u062E\u06CC\u0631\u0647 \u062F\u0633\u062A\u0647\u200C\u0628\u0646\u062F\u06CC \u0646\u0627\u0645\u0648\u0641\u0642 \u0628\u0648\u062F.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const colorPresets = [
@@ -227,10 +235,11 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 rounded-xl font-lalezar text-sm flex items-center gap-1.5 cursor-pointer shadow-xs"
+              disabled={isSaving}
+              className="px-5 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 disabled:cursor-not-allowed text-stone-950 rounded-xl font-lalezar text-sm flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <Check className="w-4 h-4" />
-              <span>ذخیره دسته‌بندی</span>
+              <span>{isSaving ? 'در حال ذخیره...' : 'ذخیره دسته‌بندی'}</span>
             </button>
           </div>
         </form>
@@ -280,7 +289,7 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
                   </button>
 
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (categories.length <= 1) {
                         alert('حداقل یک دسته‌بندی باید در سایت وجود داشته باشد.');
                         return;
@@ -290,7 +299,11 @@ export const AdminCategories: React.FC<AdminCategoriesProps> = ({
                           `آیا از حذف دسته‌بندی «${cat.name}» مطمئن هستید؟ مقالات این دسته به دسته اول منتقل می‌شوند.`
                         )
                       ) {
-                        onDeleteCategory(cat.id);
+                        try {
+                          await onDeleteCategory(cat.id);
+                        } catch (err: any) {
+                          alert(err?.message || 'حذف دسته‌بندی ناموفق بود.');
+                        }
                       }
                     }}
                     className="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"

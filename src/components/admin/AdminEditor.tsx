@@ -34,7 +34,7 @@ interface AdminEditorProps {
   article: Article | null;
   categories: Category[];
   settings: SiteSettings;
-  onSave: (article: Article) => void;
+  onSave: (article: Article) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -46,6 +46,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
   onCancel,
 }) => {
   const isNew = !article || article.id === 'new';
+  const [isSaving, setIsSaving] = useState(false);
 
   // Editor Tabs: 'content' | 'seo' | 'schema' | 'preview'
   const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'schema' | 'preview'>('content');
@@ -252,7 +253,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
   };
 
   // Save handler
-  const handleSaveArticle = () => {
+  const handleSaveArticle = async () => {
     if (!title.trim()) {
       alert('لطفاً عنوان مقاله را وارد کنید.');
       return;
@@ -301,7 +302,14 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
       },
     };
 
-    onSave(savedArticle);
+    setIsSaving(true);
+    try {
+      await onSave(savedArticle);
+    } catch (err: any) {
+      alert(err?.message || 'ذخیره مقاله ناموفق بود. دوباره تلاش کنید.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -341,11 +349,12 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
           {/* Save Button */}
           <button
             onClick={handleSaveArticle}
-            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 rounded-xl font-lalezar text-base flex items-center gap-2 transition-all shadow-xs cursor-pointer"
+            disabled={isSaving}
+            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-60 disabled:cursor-not-allowed text-stone-950 rounded-xl font-lalezar text-base flex items-center gap-2 transition-all shadow-xs cursor-pointer"
             id="admin-save-article-btn"
           >
             <Save className="w-4 h-4" />
-            <span>ذخیره و انتشار</span>
+            <span>{isSaving ? 'در حال ذخیره...' : 'ذخیره و انتشار'}</span>
           </button>
         </div>
       </div>

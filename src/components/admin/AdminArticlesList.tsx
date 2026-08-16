@@ -23,10 +23,10 @@ interface AdminArticlesListProps {
   categories: Category[];
   onNewArticle: () => void;
   onEditArticle: (article: Article) => void;
-  onDeleteArticle: (id: string) => void;
-  onDuplicateArticle: (article: Article) => void;
-  onToggleStatus: (id: string) => void;
-  onSetFeatured: (id: string) => void;
+  onDeleteArticle: (id: string) => Promise<void>;
+  onDuplicateArticle: (article: Article) => Promise<void>;
+  onToggleStatus: (id: string) => Promise<void>;
+  onSetFeatured: (id: string) => Promise<void>;
   onViewLive: (article: Article) => void;
 }
 
@@ -45,6 +45,14 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [selectedCatId, setSelectedCatId] = useState<string>('all');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  const runOrAlert = async (action: () => Promise<void>, failureMessage: string) => {
+    try {
+      await action();
+    } catch (err: any) {
+      alert(err?.message || failureMessage);
+    }
+  };
 
   const filtered = articles.filter((a) => {
     const matchesSearch =
@@ -228,7 +236,7 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                       {/* Status Toggle */}
                       <td className="py-3.5 px-4">
                         <button
-                          onClick={() => onToggleStatus(art.id)}
+                          onClick={() => runOrAlert(() => onToggleStatus(art.id), 'تغییر وضعیت انتشار ناموفق بود.')}
                           className={`px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer transition-transform hover:scale-105 ${
                             art.status === 'published'
                               ? 'bg-emerald-100 text-emerald-800'
@@ -253,7 +261,7 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           {/* Set as Hero Article */}
                           <button
-                            onClick={() => onSetFeatured(art.id)}
+                            onClick={() => runOrAlert(() => onSetFeatured(art.id), 'تغییر مقاله ویژه ناموفق بود.')}
                             className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                               art.featured
                                 ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
@@ -275,7 +283,7 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
 
                           {/* Duplicate */}
                           <button
-                            onClick={() => onDuplicateArticle(art)}
+                            onClick={() => runOrAlert(() => onDuplicateArticle(art), 'تکثیر مقاله ناموفق بود.')}
                             className="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-100 transition-colors cursor-pointer"
                             title="تکثیر و کپی مقاله"
                           >
@@ -331,8 +339,8 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                 انصراف
               </button>
               <button
-                onClick={() => {
-                  onDeleteArticle(deleteConfirmId);
+                onClick={async () => {
+                  await runOrAlert(() => onDeleteArticle(deleteConfirmId), 'حذف مقاله ناموفق بود.');
                   setDeleteConfirmId(null);
                 }}
                 className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 rounded-xl text-xs font-semibold text-white transition-colors cursor-pointer shadow-xs"

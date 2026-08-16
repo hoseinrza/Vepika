@@ -18,9 +18,9 @@ import { formatPersianDate, toPersianDigits } from '../../utils/seoAnalyzer';
 interface AdminCommentsListProps {
   comments: Comment[];
   articles: Article[];
-  onUpdateStatus: (commentId: string, status: CommentStatus) => void;
-  onDeleteComment: (commentId: string) => void;
-  onReplyComment: (commentId: string, replyText: string) => void;
+  onUpdateStatus: (commentId: string, status: CommentStatus) => Promise<void>;
+  onDeleteComment: (commentId: string) => Promise<void>;
+  onReplyComment: (commentId: string, replyText: string) => Promise<void>;
   onViewArticle: (article: Article) => void;
 }
 
@@ -50,11 +50,23 @@ export const AdminCommentsList: React.FC<AdminCommentsListProps> = ({
     return matchesStatus && matchesSearch;
   });
 
-  const handleSendReply = (commentId: string) => {
+  const runOrAlert = async (action: () => Promise<void>, failureMessage: string) => {
+    try {
+      await action();
+    } catch (err: any) {
+      alert(err?.message || failureMessage);
+    }
+  };
+
+  const handleSendReply = async (commentId: string) => {
     if (!replyText.trim()) return;
-    onReplyComment(commentId, replyText.trim());
-    setReplyText('');
-    setReplyingCommentId(null);
+    try {
+      await onReplyComment(commentId, replyText.trim());
+      setReplyText('');
+      setReplyingCommentId(null);
+    } catch (err: any) {
+      alert(err?.message || 'ارسال پاسخ ناموفق بود.');
+    }
   };
 
   return (
@@ -249,7 +261,7 @@ export const AdminCommentsList: React.FC<AdminCommentsListProps> = ({
                     {/* Approve button */}
                     {comment.status !== 'approved' && (
                       <button
-                        onClick={() => onUpdateStatus(comment.id, 'approved')}
+                        onClick={() => runOrAlert(() => onUpdateStatus(comment.id, 'approved'), 'تایید دیدگاه ناموفق بود.')}
                         className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                       >
                         <Check className="w-3.5 h-3.5" />
@@ -260,7 +272,7 @@ export const AdminCommentsList: React.FC<AdminCommentsListProps> = ({
                     {/* Reject button */}
                     {comment.status !== 'rejected' && (
                       <button
-                        onClick={() => onUpdateStatus(comment.id, 'rejected')}
+                        onClick={() => runOrAlert(() => onUpdateStatus(comment.id, 'rejected'), 'رد دیدگاه ناموفق بود.')}
                         className="px-3 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -280,7 +292,7 @@ export const AdminCommentsList: React.FC<AdminCommentsListProps> = ({
 
                   {/* Delete button */}
                   <button
-                    onClick={() => onDeleteComment(comment.id)}
+                    onClick={() => runOrAlert(() => onDeleteComment(comment.id), 'حذف دیدگاه ناموفق بود.')}
                     className="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                     title="حذف دیدگاه"
                   >
