@@ -61,7 +61,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
           {/* Drawer Header */}
           <div className="p-5 border-b border-slate-200/90 flex items-center justify-between bg-slate-50/90 backdrop-blur-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-600/20">
+              <div className="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold shadow-md shadow-red-600/20">
                 <Bookmark className="w-5 h-5 fill-white" />
               </div>
               <div>
@@ -87,7 +87,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
           <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-3">
             {bookmarkedArticles.length === 0 ? (
               <div className="text-center py-20 px-4 text-slate-400 space-y-4 animate-in fade-in duration-300">
-                <div className="w-16 h-16 rounded-3xl bg-blue-50 text-blue-500 flex items-center justify-center mx-auto shadow-inner">
+                <div className="w-16 h-16 rounded-3xl bg-red-50 text-red-500 flex items-center justify-center mx-auto shadow-inner">
                   <Bookmark className="w-8 h-8 stroke-1" />
                 </div>
                 <div className="space-y-1.5">
@@ -100,7 +100,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                 </div>
                 <button
                   onClick={onClose}
-                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md shadow-blue-600/20 hover:scale-105 transform-gpu"
+                  className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md shadow-red-600/20 hover:scale-105 transform-gpu"
                 >
                   <BookOpen className="w-4 h-4" />
                   <span>مرور مقالات و آموزش‌ها</span>
@@ -112,7 +112,7 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                 return (
                   <div
                     key={article.id}
-                    className="p-3 bg-white hover:bg-blue-50/40 rounded-2xl border border-slate-200/90 hover:border-blue-400 hover:shadow-lg transition-all duration-200 flex gap-3 group shadow-2xs animate-in fade-in slide-in-from-bottom-2 duration-300"
+                    className="p-3 bg-white hover:bg-red-50/40 rounded-2xl border border-slate-200/90 hover:border-red-400 hover:shadow-lg transition-all duration-200 flex gap-3 group shadow-2xs animate-in fade-in slide-in-from-bottom-2 duration-300"
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <div
@@ -141,14 +141,14 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
                         <div className="flex items-center gap-1.5 mb-1">
                           <span
                             className="w-1.5 h-1.5 rounded-full shrink-0"
-                            style={{ backgroundColor: cat?.color || '#2563EB' }}
+                            style={{ backgroundColor: cat?.color || '#DC2626' }}
                           />
                           <span className="text-[10px] font-bold text-slate-500 truncate">
                             {cat?.name || 'آموزش'}
                           </span>
                         </div>
 
-                        <h4 className="font-lalezar text-sm text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-tight tracking-wide">
+                        <h4 className="font-lalezar text-sm text-slate-900 group-hover:text-red-600 transition-colors line-clamp-2 leading-tight tracking-wide">
                           {article.title}
                         </h4>
                       </div>
@@ -181,12 +181,12 @@ export const BookmarksDrawer: React.FC<BookmarksDrawerProps> = ({
           {bookmarkedArticles.length > 0 && (
             <div className="p-4 border-t border-slate-200 bg-slate-50/80 flex items-center justify-between text-xs text-slate-500">
               <span className="flex items-center gap-1.5 text-[11px]">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <Sparkles className="w-3.5 h-3.5 text-red-600" />
                 <span>ذخیره‌شده در حافظه مرورگر شما</span>
               </span>
               <button
                 onClick={onClose}
-                className="font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 cursor-pointer"
+                className="font-bold text-red-600 hover:text-red-700 flex items-center gap-1 cursor-pointer"
               >
                 <span>ادامه مطالعه</span>
                 <ArrowLeft className="w-3.5 h-3.5" />

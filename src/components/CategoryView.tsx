@@ -158,7 +158,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               onClick={() => setSelectedDifficulty(d.id as any)}
               className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
                 selectedDifficulty === d.id
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-red-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
@@ -196,7 +196,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 font-bold text-slate-700 focus:outline-hidden focus:border-blue-600 cursor-pointer"
+            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 font-bold text-slate-700 focus:outline-hidden focus:border-red-600 cursor-pointer"
           >
             <option value="newest">جدیدترین انتشار</option>
             <option value="views">پربازدیدترین</option>
@@ -218,7 +218,7 @@ export const CategoryView: React.FC<CategoryViewProps> = ({
               setSelectedDifficulty('all');
               setSelectedType('all');
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors cursor-pointer"
+            className="px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 transition-colors cursor-pointer"
           >
             حذف فیلترها
           </button>

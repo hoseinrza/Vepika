@@ -4,11 +4,11 @@ import { Article, Category, SiteSettings } from '../types';
  * Generates JSON-LD Schema data for an Article based on schema.org standards
  */
 export function generateArticleSchema(article: Article, category?: Category, settings?: Partial<SiteSettings>) {
-  const siteUrl = settings?.siteUrl || 'https://lalezar-blog.ir';
+  const siteUrl = settings?.siteUrl || 'https://redwebs.ir';
   const articleUrl = `${siteUrl}/article/${article.slug}`;
-  const authorName = article.author?.name || settings?.authorName || 'تحریریه وبلاگ لاله زار';
+  const authorName = article.author?.name || settings?.authorName || 'تحریریه ردوبز';
   const authorBio = article.author?.bio || settings?.authorBio || 'نویسنده و پژوهشگر حوزه فناوری و آموزش';
-  const publisherName = settings?.siteTitle || 'وبلاگ آموزشی لاله زار';
+  const publisherName = settings?.siteTitle || 'ردوبز';
 
   // Base Article / BlogPosting Schema
   const schema: any = {
@@ -76,7 +76,7 @@ export function generateArticleSchema(article: Article, category?: Category, set
 /**
  * Generates BreadcrumbList Schema
  */
-export function generateBreadcrumbSchema(article: Article, category?: Category, siteUrl: string = 'https://lalezar-blog.ir') {
+export function generateBreadcrumbSchema(article: Article, category?: Category, siteUrl: string = 'https://redwebs.ir') {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -137,8 +137,8 @@ export function generateWebsiteSchema(settings: SiteSettings) {
 export function applyHeadMetadata(article?: Article, category?: Category, settings?: SiteSettings) {
   if (typeof document === 'undefined') return;
 
-  const siteTitle = settings?.siteTitle || 'وبلاگ آموزشی لاله زار';
-  const siteUrl = settings?.siteUrl || 'https://lalezar-blog.ir';
+  const siteTitle = settings?.siteTitle || 'ردوبز';
+  const siteUrl = settings?.siteUrl || 'https://redwebs.ir';
 
   if (!article) {
     // Default homepage meta
@@ -263,7 +263,7 @@ function removeJsonLd(id: string) {
 /**
  * Generates dynamic sitemap.xml string for all articles and categories
  */
-export function generateSitemapXml(articles: Article[], categories: Category[], siteUrl: string = 'https://lalezar-blog.ir'): string {
+export function generateSitemapXml(articles: Article[], categories: Category[], siteUrl: string = 'https://redwebs.ir'): string {
   const published = articles.filter((a) => a.status === 'published');
   
   const articleUrls = published.map((a) => `  <url>
@@ -294,7 +294,7 @@ ${categoryUrls}
 /**
  * Generates standard robots.txt
  */
-export function generateRobotsTxt(siteUrl: string = 'https://lalezar-blog.ir'): string {
+export function generateRobotsTxt(siteUrl: string = 'https://redwebs.ir'): string {
   return `User-agent: *
 Allow: /
 Disallow: /admin

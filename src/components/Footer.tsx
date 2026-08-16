@@ -19,7 +19,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Category, SiteSettings } from '../types';
-import { VepikaLogo } from './VepikaLogo';
+import { RedwebsLogo } from './RedwebsLogo';
 import { toPersianDigits } from '../utils/seoAnalyzer';
 
 interface FooterProps {
@@ -63,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({
       id="main-footer"
     >
       {/* Subtle Ambient Background Glows */}
-      <div className="absolute top-0 right-1/4 w-96 h-32 bg-blue-600/10 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-96 h-32 bg-red-600/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-32 bg-purple-600/10 blur-3xl pointer-events-none" />
 
       {/* Top Value Banner */}
@@ -75,14 +75,14 @@ export const Footer: React.FC<FooterProps> = ({
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
             <span className="font-medium text-slate-300">
-              <strong className="text-white font-lalezar text-sm tracking-wide ml-1.5">وپیکـا؛</strong>
+              <strong className="text-white font-lalezar text-sm tracking-wide ml-1.5">ردوبز؛</strong>
               پایگاه تخصصی یادگیری، توسعه افزونه و قالب وردپرس، ارتقای سرعت و سئو تکنیکال
             </span>
           </div>
 
           <div className="flex items-center gap-3 text-xs text-slate-400">
             <div className="flex items-center gap-1.5 bg-slate-800/80 border border-slate-700/70 px-3 py-1 rounded-full">
-              <Code2 className="w-3.5 h-3.5 text-blue-400" />
+              <Code2 className="w-3.5 h-3.5 text-red-400" />
               <span>سازگار با PHP 8.x و WP 6.7+</span>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 bg-slate-800/80 border border-slate-700/70 px-3 py-1 rounded-full text-emerald-400">
@@ -99,10 +99,10 @@ export const Footer: React.FC<FooterProps> = ({
           
           {/* Column 1: Brand & Identity (4 Cols) */}
           <div className="lg:col-span-4 space-y-5">
-            <VepikaLogo theme="dark" size="md" showTagline />
+            <RedwebsLogo theme="dark" size="md" showTagline />
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify max-w-sm font-normal">
-              وپیکا رسانه مستقل و مرجع تخصصی آموزش وردپرس، توسعه و معماری وب، سئو تکنیکال و ابزارهای کاربردی کدنویسی است. هدف ما پرورش نسل نوین متخصصان و مهندسان وب فارسی با محتوای استاندارد و تست‌شده است.
+              ردوبز رسانه مستقل و مرجع تخصصی آموزش وردپرس، توسعه و معماری وب، سئو تکنیکال و ابزارهای کاربردی کدنویسی است. هدف ما پرورش نسل نوین متخصصان و مهندسان وب فارسی با محتوای استاندارد و تست‌شده است.
             </p>
 
             <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-slate-400">
@@ -111,7 +111,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <span>اسکیما استاندارد JSON-LD گوگل</span>
               </div>
               <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <Sparkles className="w-3.5 h-3.5 text-red-400" />
                 <span>طراحی اختصاصی RTL</span>
               </div>
             </div>
@@ -120,7 +120,7 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Column 2: Specialist Topics (3 Cols) */}
           <div className="lg:col-span-3 space-y-4">
             <h3 className="font-lalezar text-base sm:text-lg text-white tracking-wide flex items-center gap-2">
-              <Layers className="w-4 h-4 text-blue-500" />
+              <Layers className="w-4 h-4 text-red-500" />
               <span>دسته‌بندی‌های تخصصی</span>
             </h3>
 
@@ -132,7 +132,7 @@ export const Footer: React.FC<FooterProps> = ({
                       onSelectCategory(cat.id);
                       scrollToTop();
                     }}
-                    className="hover:text-blue-400 transition-colors flex items-center justify-between w-full group text-right cursor-pointer"
+                    className="hover:text-red-400 transition-colors flex items-center justify-between w-full group text-right cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5">
                       <span
@@ -168,7 +168,7 @@ export const Footer: React.FC<FooterProps> = ({
                     onSelectCategory(null);
                     scrollToTop();
                   }}
-                  className="hover:text-blue-400 transition-colors cursor-pointer flex items-center gap-2"
+                  className="hover:text-red-400 transition-colors cursor-pointer flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
                   <span>صفحه اصلی رسانه</span>
@@ -178,9 +178,9 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={onOpenToolkit}
-                    className="hover:text-blue-400 transition-colors flex items-center gap-2 cursor-pointer group"
+                    className="hover:text-red-400 transition-colors flex items-center gap-2 cursor-pointer group"
                   >
-                    <Wrench className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                    <Wrench className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
                     <span>جعبه ابزار کدهای وردپرس</span>
                   </button>
                 </li>
@@ -199,7 +199,7 @@ export const Footer: React.FC<FooterProps> = ({
               <li>
                 <button
                   onClick={onOpenAdmin}
-                  className="hover:text-blue-400 transition-colors flex items-center gap-2 cursor-pointer group"
+                  className="hover:text-red-400 transition-colors flex items-center gap-2 cursor-pointer group"
                   id="footer-admin-link"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
@@ -212,8 +212,8 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Column 4: Newsletter & Community (3 Cols) */}
           <div className="lg:col-span-3 space-y-4">
             <h3 className="font-lalezar text-base sm:text-lg text-white tracking-wide flex items-center gap-2">
-              <Send className="w-4 h-4 text-blue-400" />
-              <span>خبرنامه مهندسی وپیکا</span>
+              <Send className="w-4 h-4 text-red-400" />
+              <span>خبرنامه مهندسی ردوبز</span>
             </h3>
 
             <p className="text-xs text-slate-400 leading-relaxed">
@@ -237,11 +237,11 @@ export const Footer: React.FC<FooterProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@example.com"
-                    className="w-full bg-slate-900 text-slate-100 text-xs px-3.5 py-3 rounded-2xl border border-slate-800 focus:border-blue-500 focus:outline-hidden placeholder:text-slate-500 text-left dir-ltr transition-all shadow-inner"
+                    className="w-full bg-slate-900 text-slate-100 text-xs px-3.5 py-3 rounded-2xl border border-slate-800 focus:border-red-500 focus:outline-hidden placeholder:text-slate-500 text-left dir-ltr transition-all shadow-inner"
                   />
                   <button
                     type="submit"
-                    className="absolute left-1.5 top-1.5 bottom-1.5 px-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md hover:scale-[1.02] transform-gpu"
+                    className="absolute left-1.5 top-1.5 bottom-1.5 px-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md hover:scale-[1.02] transform-gpu"
                   >
                     <span>عضویت</span>
                     <Send className="w-3 h-3" />
@@ -260,7 +260,7 @@ export const Footer: React.FC<FooterProps> = ({
         <div className="border-t border-slate-900 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
             <p>
-              {settings.footerText || '© تمامی حقوق مادی و معنوی برای رسانه تخصصی وپیکا (Vepika) محفوظ است.'}
+              {settings.footerText || '© تمامی حقوق مادی و معنوی برای رسانه تخصصی ردوبز (Redwebs) محفوظ است.'}
             </p>
             <span className="hidden sm:inline text-slate-700">•</span>
             <span className="text-[11px] text-slate-600 font-mono">v2.4 LTS</span>
@@ -272,7 +272,7 @@ export const Footer: React.FC<FooterProps> = ({
             title="بازگشت به بالای صفحه"
           >
             <span className="text-xs font-medium">بازگشت به بالا</span>
-            <ArrowUp className="w-3.5 h-3.5 text-blue-400 group-hover:-translate-y-0.5 transition-transform" />
+            <ArrowUp className="w-3.5 h-3.5 text-red-400 group-hover:-translate-y-0.5 transition-transform" />
           </button>
         </div>
       </div>

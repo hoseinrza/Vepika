@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Category, ViewMode } from '../types';
-import { VepikaLogo } from './VepikaLogo';
+import { RedwebsLogo } from './RedwebsLogo';
 import {
   Search,
   Bookmark,
@@ -93,9 +93,9 @@ export const Header: React.FC<HeaderProps> = ({
                 onNavigate('home');
               }}
               className="group flex items-center gap-2.5 focus:outline-hidden cursor-pointer whitespace-nowrap"
-              title="صفحه اصلی وپیکا"
+              title="صفحه اصلی ردوبز"
             >
-              <VepikaLogo size="sm" showTagline={false} />
+              <RedwebsLogo size="sm" showTagline={false} />
             </button>
 
             {/* Vertical Separator */}
@@ -111,13 +111,13 @@ export const Header: React.FC<HeaderProps> = ({
                 }}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                   viewMode === 'home' && !selectedCategoryId
-                    ? 'text-blue-600 bg-blue-50/90 font-extrabold shadow-2xs'
-                    : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100/70'
+                    ? 'text-red-600 bg-red-50/90 font-extrabold shadow-2xs'
+                    : 'text-slate-700 hover:text-red-600 hover:bg-slate-100/70'
                 }`}
               >
                 <span>صفحه اصلی</span>
                 {viewMode === 'home' && !selectedCategoryId && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
                 )}
               </button>
 
@@ -127,16 +127,16 @@ export const Header: React.FC<HeaderProps> = ({
                   onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
                   className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                     selectedCategoryId || isMegaMenuOpen || viewMode === 'category' || viewMode === 'categories-index'
-                      ? 'text-blue-600 bg-blue-50/90 shadow-2xs'
-                      : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100/70'
+                      ? 'text-red-600 bg-red-50/90 shadow-2xs'
+                      : 'text-slate-700 hover:text-red-600 hover:bg-slate-100/70'
                   }`}
                   aria-expanded={isMegaMenuOpen}
                 >
-                  <Layers className="w-3.5 h-3.5 text-blue-600" />
+                  <Layers className="w-3.5 h-3.5 text-red-600" />
                   <span>دسته‌بندی‌ها</span>
                   <ChevronDown
                     className={`w-3.5 h-3.5 transition-transform duration-250 ${
-                      isMegaMenuOpen ? 'rotate-180 text-blue-600' : 'text-slate-400'
+                      isMegaMenuOpen ? 'rotate-180 text-red-600' : 'text-slate-400'
                     }`}
                   />
                 </button>
@@ -146,12 +146,12 @@ export const Header: React.FC<HeaderProps> = ({
                   <div className="absolute top-full right-0 mt-2.5 w-[520px] bg-white rounded-3xl border border-slate-200/90 shadow-2xl shadow-slate-900/15 p-4 z-50 animate-in fade-in-0 zoom-in-95 duration-200 origin-top-right">
                     <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <div className="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
                           <LayoutGrid className="w-4 h-4" />
                         </div>
                         <div>
                           <h4 className="font-lalezar text-base text-slate-900 tracking-wide leading-none">
-                            موضوعات آموزشی وپیکا
+                            موضوعات آموزشی ردوبز
                           </h4>
                           <p className="text-[10px] text-slate-400 mt-0.5 whitespace-nowrap">
                             ۱۰ شاخه تخصصی مهندسی وردپرس و طراحی وب
@@ -164,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
                           onNavigate('categories-index');
                           setIsMegaMenuOpen(false);
                         }}
-                        className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                        className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
                       >
                         <span>همه دسته‌ها</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export const Header: React.FC<HeaderProps> = ({
                             }}
                             className={`p-2 text-right rounded-2xl transition-all duration-200 flex items-center justify-between gap-2.5 cursor-pointer group/item whitespace-nowrap ${
                               isSelected
-                                ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                                ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
                                 : 'hover:bg-slate-50 border border-transparent hover:border-slate-200/80 text-slate-700'
                             }`}
                           >
@@ -196,13 +196,13 @@ export const Header: React.FC<HeaderProps> = ({
                                 }}
                               />
                               <span className={`text-xs font-bold truncate ${
-                                isSelected ? 'text-white' : 'group-hover/item:text-blue-600'
+                                isSelected ? 'text-white' : 'group-hover/item:text-red-600'
                               }`}>
                                 {cat.name}
                               </span>
                             </div>
                             <span className={`text-[10px] shrink-0 font-medium ${
-                              isSelected ? 'text-blue-100' : 'text-slate-400'
+                              isSelected ? 'text-red-100' : 'text-slate-400'
                             }`}>
                               {cat.postCount || 0}
                             </span>
@@ -211,7 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
                       })}
                     </div>
 
-                    <div className="mt-3 pt-2.5 border-t border-slate-100 bg-gradient-to-l from-blue-50/70 to-purple-50/50 p-2.5 rounded-xl flex items-center justify-between">
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 bg-gradient-to-l from-red-50/70 to-purple-50/50 p-2.5 rounded-xl flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Flame className="w-3.5 h-3.5 text-amber-500" />
                         <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">
@@ -231,13 +231,13 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => onNavigate('toolkit')}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                   viewMode === 'toolkit' || viewMode === 'tools'
-                    ? 'text-blue-600 bg-blue-50/90 font-extrabold shadow-2xs'
-                    : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100/70'
+                    ? 'text-red-600 bg-red-50/90 font-extrabold shadow-2xs'
+                    : 'text-slate-700 hover:text-red-600 hover:bg-slate-100/70'
                 }`}
               >
-                <Code2 className="w-3.5 h-3.5 text-blue-600" />
+                <Code2 className="w-3.5 h-3.5 text-red-600" />
                 <span>جعبه ابزار کدهای وردپرس</span>
-                <span className="bg-blue-100/80 text-blue-700 text-[10px] font-mono px-1.5 py-0.2 rounded-md font-bold">
+                <span className="bg-red-100/80 text-red-700 text-[10px] font-mono px-1.5 py-0.2 rounded-md font-bold">
                   PRO
                 </span>
               </button>
@@ -262,10 +262,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Live Search Button */}
             <button
               onClick={onOpenSearch}
-              className="group flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-100 hover:border-blue-500/50 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all duration-200 cursor-pointer border border-slate-200/90 shadow-2xs whitespace-nowrap"
+              className="group flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-slate-100/80 hover:bg-slate-100 hover:border-red-500/50 text-slate-600 hover:text-slate-900 text-xs font-medium transition-all duration-200 cursor-pointer border border-slate-200/90 shadow-2xs whitespace-nowrap"
               title="جستجوی هوشمند (Ctrl+K)"
             >
-              <Search className="w-3.5 h-3.5 text-blue-600 group-hover:scale-110 transition-transform" />
+              <Search className="w-3.5 h-3.5 text-red-600 group-hover:scale-110 transition-transform" />
               <span className="hidden md:inline font-medium">جستجو...</span>
               <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-bold text-slate-500 bg-white rounded-md border border-slate-300/80 shadow-2xs">
                 ⌘K
@@ -275,12 +275,12 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Bookmark Drawer Button */}
             <button
               onClick={onToggleBookmarksDrawer}
-              className="relative p-2 text-slate-700 hover:text-blue-600 hover:bg-blue-50/80 rounded-xl transition-all duration-200 cursor-pointer border border-slate-200/70 hover:border-blue-200 shadow-2xs group whitespace-nowrap"
+              className="relative p-2 text-slate-700 hover:text-red-600 hover:bg-red-50/80 rounded-xl transition-all duration-200 cursor-pointer border border-slate-200/70 hover:border-red-200 shadow-2xs group whitespace-nowrap"
               title="آموزش‌های نشان‌شده"
             >
               <Bookmark className="w-4 h-4 group-hover:scale-110 transition-transform" />
               {bookmarkedCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs ring-2 ring-white">
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-xs ring-2 ring-white">
                   {bookmarkedCount}
                 </span>
               )}
@@ -289,10 +289,10 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Admin Dashboard CTA */}
             <button
               onClick={() => onNavigate('admin')}
-              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-blue-600 text-white rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs hover:shadow-blue-600/20 whitespace-nowrap"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-red-600 text-white rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer shadow-xs hover:shadow-red-600/20 whitespace-nowrap"
               title="پیشخوان مدیریت"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
               <span>پیشخوان مدیریت</span>
               {pendingCommentsCount > 0 && (
                 <span className="bg-amber-400 text-slate-950 px-1.5 py-0.2 rounded-full text-[10px] font-bold">
@@ -323,7 +323,7 @@ export const Header: React.FC<HeaderProps> = ({
               onNavigate('home');
               setIsMobileMenuOpen(false);
             }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center justify-between whitespace-nowrap"
+            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <span>صفحه اصلی</span>
             <ArrowLeft className="w-4 h-4 text-slate-400" />
@@ -334,13 +334,13 @@ export const Header: React.FC<HeaderProps> = ({
               onNavigate('categories-index');
               setIsMobileMenuOpen(false);
             }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center justify-between whitespace-nowrap"
+            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-blue-600" />
-              <span>دسته‌بندی‌های تخصصی وپیکا</span>
+              <Layers className="w-4 h-4 text-red-600" />
+              <span>دسته‌بندی‌های تخصصی ردوبز</span>
             </div>
-            <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md">
+            <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-md">
               ۱۰ شاخه
             </span>
           </button>
@@ -354,7 +354,7 @@ export const Header: React.FC<HeaderProps> = ({
                   onNavigate('category');
                   setIsMobileMenuOpen(false);
                 }}
-                className="p-1.5 text-right rounded-lg text-[11px] font-bold text-slate-700 hover:bg-white hover:text-blue-600 transition-colors flex items-center gap-2 whitespace-nowrap"
+                className="p-1.5 text-right rounded-lg text-[11px] font-bold text-slate-700 hover:bg-white hover:text-red-600 transition-colors flex items-center gap-2 whitespace-nowrap"
               >
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
                 <span className="truncate">{cat.name}</span>
@@ -367,13 +367,13 @@ export const Header: React.FC<HeaderProps> = ({
               onNavigate('toolkit');
               setIsMobileMenuOpen(false);
             }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-blue-50 hover:text-blue-600 transition-colors flex items-center justify-between whitespace-nowrap"
+            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <div className="flex items-center gap-2">
-              <Code2 className="w-4 h-4 text-blue-600" />
+              <Code2 className="w-4 h-4 text-red-600" />
               <span>جعبه ابزار کدهای وردپرس</span>
             </div>
-            <span className="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-md font-mono">
+            <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-mono">
               WP
             </span>
           </button>
@@ -387,7 +387,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-purple-600" />
-              <span>دیزاین سیستم وپیکا</span>
+              <span>دیزاین سیستم ردوبز</span>
             </div>
             <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md">
               UI Kit
@@ -399,10 +399,10 @@ export const Header: React.FC<HeaderProps> = ({
               onNavigate('admin');
               setIsMobileMenuOpen(false);
             }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-blue-600 transition-colors flex items-center justify-between mt-2 shadow-sm whitespace-nowrap"
+            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-white hover:bg-red-600 transition-colors flex items-center justify-between mt-2 shadow-sm whitespace-nowrap"
           >
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-blue-400" />
+              <ShieldCheck className="w-4 h-4 text-red-400" />
               <span>ورود به پیشخوان مدیریت</span>
             </div>
             {pendingCommentsCount > 0 && (

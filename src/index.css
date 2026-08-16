@@ -50,18 +50,18 @@
 }
 
 /* Article rich text formatting for high Persian readability */
-.prose-vepika {
+.prose-redwebs {
   line-height: 2;
   font-size: 1.0625rem;
   color: #334155;
 }
 
-.prose-vepika p {
+.prose-redwebs p {
   margin-bottom: 1.5rem;
   text-align: justify;
 }
 
-.prose-vepika h2 {
+.prose-redwebs h2 {
   font-weight: 800;
   font-size: 1.625rem;
   margin-top: 2.75rem;
@@ -74,7 +74,7 @@
   padding-bottom: 0.75rem;
 }
 
-.prose-vepika h3 {
+.prose-redwebs h3 {
   font-weight: 700;
   font-size: 1.3rem;
   margin-top: 2rem;
@@ -82,20 +82,20 @@
   color: #1e293b;
 }
 
-.prose-vepika blockquote {
-  border-right: 4px solid #2563eb;
+.prose-redwebs blockquote {
+  border-right: 4px solid #dc2626;
   padding-right: 1.25rem;
   padding-left: 1rem;
   margin: 1.75rem 0;
-  background-color: #eff6ff;
+  background-color: #fef2f2;
   padding-top: 1rem;
   padding-bottom: 1rem;
   border-radius: 0 0.75rem 0.75rem 0;
   font-style: normal;
-  color: #1e40af;
+  color: #991b1b;
 }
 
-.prose-vepika code {
+.prose-redwebs code {
   background-color: #f1f5f9;
   color: #0f172a;
   padding: 0.2rem 0.45rem;
@@ -107,7 +107,7 @@
   border: 1px solid #e2e8f0;
 }
 
-.prose-vepika pre {
+.prose-redwebs pre {
   background-color: #0f172a;
   color: #f8fafc;
   padding: 1.25rem 1.5rem;
@@ -120,18 +120,18 @@
   border: 1px solid #1e293b;
 }
 
-.prose-vepika ul {
+.prose-redwebs ul {
   list-style-type: disc;
   padding-right: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.prose-vepika ol {
+.prose-redwebs ol {
   list-style-type: decimal;
   padding-right: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.prose-vepika li {
+.prose-redwebs li {
   margin-bottom: 0.625rem;
 }

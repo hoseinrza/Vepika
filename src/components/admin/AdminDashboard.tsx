@@ -150,7 +150,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-stone-500 text-xs font-semibold">
             <span>مجموع بازدید مقالات</span>
-            <Eye className="w-4 h-4 text-blue-600" />
+            <Eye className="w-4 h-4 text-red-600" />
           </div>
           <div className="font-lalezar text-3xl text-stone-900">
             {toPersianDigits(totalViews)}

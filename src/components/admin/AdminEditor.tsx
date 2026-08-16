@@ -402,10 +402,10 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                 : 'text-stone-500 hover:text-stone-800'
             }`}
           >
-            <Code className="w-4 h-4 text-blue-600" />
+            <Code className="w-4 h-4 text-red-600" />
             <span>۳. اسکیما خودکار و سوالات FAQ</span>
             {faqItems.length > 0 && (
-              <span className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full font-bold">
+              <span className="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.5 rounded-full font-bold">
                 {toPersianDigits(faqItems.length)} سوال
               </span>
             )}
@@ -913,7 +913,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                     <span>{settings.siteTitle}</span>
                     <span className="text-stone-400">› article › {slug || 'article-slug'}</span>
                   </div>
-                  <h4 className="text-base text-blue-800 font-medium hover:underline cursor-pointer">
+                  <h4 className="text-base text-red-800 font-medium hover:underline cursor-pointer">
                     {metaTitle || (title ? `${title} | ${settings.siteTitle}` : 'عنوان سئو مقاله')}
                   </h4>
                   <p className="text-xs text-stone-600 leading-relaxed">

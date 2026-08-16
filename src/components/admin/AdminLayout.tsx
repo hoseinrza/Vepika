@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Code,
   Sliders,
+  LogOut,
 } from 'lucide-react';
 import { AdminTab, Article, Category, Comment, SiteSettings } from '../../types';
 import { toPersianDigits } from '../../utils/seoAnalyzer';
@@ -21,7 +22,7 @@ import { AdminEditor } from './AdminEditor';
 import { AdminCommentsList } from './AdminCommentsList';
 import { AdminCategories } from './AdminCategories';
 import { AdminSeoSettings } from './AdminSeoSettings';
-import { VepikaLogo } from '../VepikaLogo';
+import { RedwebsLogo } from '../RedwebsLogo';
 
 interface AdminLayoutProps {
   currentTab: AdminTab;
@@ -32,6 +33,7 @@ interface AdminLayoutProps {
   settings: SiteSettings;
   onNavigateTab: (tab: AdminTab, params?: any) => void;
   onExitAdmin: () => void;
+  onLogout: () => void;
   onSaveArticle: (article: Article) => void;
   onDeleteArticle: (id: string) => void;
   onDuplicateArticle: (article: Article) => void;
@@ -55,6 +57,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   settings,
   onNavigateTab,
   onExitAdmin,
+  onLogout,
   onSaveArticle,
   onDeleteArticle,
   onDuplicateArticle,
@@ -120,8 +123,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         {/* Sidebar Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="space-y-1">
-            <VepikaLogo theme="dark" size="sm" />
-            <span className="text-[11px] text-blue-400 font-bold block pt-1">
+            <RedwebsLogo theme="dark" size="sm" />
+            <span className="text-[11px] text-red-400 font-bold block pt-1">
               پیشخوان مدیریت آموزش‌ها
             </span>
           </div>
@@ -139,7 +142,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 onClick={() => onNavigateTab(item.id, item.params)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs'
+                    ? 'bg-red-600 text-white shadow-xs'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
@@ -150,7 +153,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 {item.badge && (
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                      item.badgeColor || (isActive ? 'bg-slate-900 text-blue-300' : 'bg-slate-800 text-slate-300')
+                      item.badgeColor || (isActive ? 'bg-slate-900 text-red-300' : 'bg-slate-800 text-slate-300')
                     }`}
                   >
                     {item.badge}
@@ -165,11 +168,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         <div className="p-4 border-t border-slate-800 space-y-2">
           <button
             onClick={onExitAdmin}
-            className="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-700"
+            className="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-700"
             id="admin-exit-to-site-btn"
           >
             <ArrowRight className="w-4 h-4" />
             <span>مشاهده و بازگشت به وبسایت</span>
+          </button>
+          <button
+            onClick={onLogout}
+            className="w-full py-2.5 px-3 bg-transparent hover:bg-rose-500/10 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-rose-500/20"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>خروج از حساب کاربری</span>
           </button>
         </div>
       </aside>

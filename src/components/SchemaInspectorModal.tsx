@@ -105,7 +105,7 @@ export const SchemaInspectorModal: React.FC<SchemaInspectorModalProps> = ({
                 : 'text-stone-500 hover:text-stone-800'
             }`}
           >
-            <Globe className="w-4 h-4 text-blue-600" />
+            <Globe className="w-4 h-4 text-red-600" />
             <span>متاتگ‌های OpenGraph و Twitter</span>
           </button>
         </div>
@@ -133,7 +133,7 @@ export const SchemaInspectorModal: React.FC<SchemaInspectorModalProps> = ({
                     <span className="text-stone-500">{category?.name || 'آموزش'}</span>
                   </div>
 
-                  <h4 className="text-lg text-blue-800 hover:underline font-medium cursor-pointer leading-snug">
+                  <h4 className="text-lg text-red-800 hover:underline font-medium cursor-pointer leading-snug">
                     {metaTitle}
                   </h4>
 
@@ -224,7 +224,7 @@ export const SchemaInspectorModal: React.FC<SchemaInspectorModalProps> = ({
                 <p>&lt;meta name="robots" content="{article.seo.robotsIndex ? 'index, follow' : 'noindex, nofollow'}" /&gt;</p>
                 <p>&lt;link rel="canonical" href="{canonical}" /&gt;</p>
                 
-                <p className="text-blue-400 pt-2">&lt;!-- Open Graph / Facebook --&gt;</p>
+                <p className="text-red-400 pt-2">&lt;!-- Open Graph / Facebook --&gt;</p>
                 <p>&lt;meta property="og:type" content="article" /&gt;</p>
                 <p>&lt;meta property="og:title" content="{metaTitle}" /&gt;</p>
                 <p>&lt;meta property="og:description" content="{metaDesc}" /&gt;</p>

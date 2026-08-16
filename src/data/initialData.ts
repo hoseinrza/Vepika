@@ -156,7 +156,7 @@ export const INITIAL_ARTICLES: Article[] = [
         stepNumber: 2,
         title: 'تنظیمات بهینه‌سازی CSS و کدهای جاوااسکریپت',
         description: 'کدهای مسدودکننده رندر (Render-blocking resources) را با روش Defer و فشرده‌سازی Minify برطرف کنید.',
-        codeSnippet: `// کدهای هوک برای تاخیر در بارگذاری جاوااسکریپت‌های غیرضروری\nfunction vepika_defer_scripts($tag, $handle, $src) {\n    $defer_scripts = array('custom-analytics', 'chat-widget');\n    if (in_array($handle, $defer_scripts)) {\n        return '<script src="' . esc_url($src) . '" defer="defer"></script>';\n    }\n    return $tag;\n}\nadd_filter('script_loader_tag', 'vepika_defer_scripts', 10, 3);`,
+        codeSnippet: `// کدهای هوک برای تاخیر در بارگذاری جاوااسکریپت‌های غیرضروری\nfunction redwebs_defer_scripts($tag, $handle, $src) {\n    $defer_scripts = array('custom-analytics', 'chat-widget');\n    if (in_array($handle, $defer_scripts)) {\n        return '<script src="' . esc_url($src) . '" defer="defer"></script>';\n    }\n    return $tag;\n}\nadd_filter('script_loader_tag', 'redwebs_defer_scripts', 10, 3);`,
         language: 'php',
         tip: 'جی‌کوئری اصلی وردپرس (jquery-core) را هرگز Defer نکنید تا تداخلی در اسکریپت‌های پوسته ایجاد نشود.',
       },
@@ -174,10 +174,10 @@ export const INITIAL_ARTICLES: Article[] = [
       }
     ],
     seo: {
-      metaTitle: 'راهنمای جامع افزایش سرعت وردپرس و Core Web Vitals | وپیکا',
+      metaTitle: 'راهنمای جامع افزایش سرعت وردپرس و Core Web Vitals | ردوبز',
       metaDescription: 'آموزش گام‌به‌گام افزایش سرعت وردپرس و رساندن امتیاز PageSpeed به ۱۰۰ با کانفیگ کش لایت‌اسپید، کش ردیس و بهینه‌سازی کدهای فرانت‌اند.',
       focusKeyword: 'افزایش سرعت وردپرس',
-      canonicalUrl: 'https://vepika.ir/article/complete-wordpress-speed-optimization-guide',
+      canonicalUrl: 'https://redwebs.ir/article/complete-wordpress-speed-optimization-guide',
       robotsIndex: true,
       schemaType: 'TechArticle',
       faqItems: [
@@ -196,7 +196,7 @@ export const INITIAL_ARTICLES: Article[] = [
     content: `
 بهینه‌سازی سرعت سایت و پایداری تجربه کاربری (Core Web Vitals) از حیاتی‌ترین ارکان موفقیت هر رسانه و کسب‌وکار آنلاین است. طبق آخرین الگوریتم‌های گوگل، سایت‌هایی که زمان پاسخگویی بالای ۲.۵ ثانیه دارند، نه تنها با افت محسوس رتبه در موتورهای جستجو مواجه می‌شوند، بلکه تا ۵۳٪ از کاربران موبایل خود را قبل از لود کامل صفحه از دست می‌دهند.
 
-در این مقاله تخصصی از **وپیکا**، نقشه راه کاملاً عملی و تست‌شده‌ای برای دستیابی به لود زیر ۱ ثانیه و کسب امتیاز سبز در ابزارهای Google PageSpeed Insights و GTmetrix ارائه می‌کنیم.
+در این مقاله تخصصی از **ردوبز**، نقشه راه کاملاً عملی و تست‌شده‌ای برای دستیابی به لود زیر ۱ ثانیه و کسب امتیاز سبز در ابزارهای Google PageSpeed Insights و GTmetrix ارائه می‌کنیم.
 
 ---
 
@@ -204,7 +204,7 @@ export const INITIAL_ARTICLES: Article[] = [
 
 زمان رسیدن اولین بایت (**Time to First Byte**) معیاری است که نشان می‌دهد سرور هاست چقدر طول می‌کشد تا درخواست اولیه مرورگر را پردازش کرده و اولین بخش از محتوا را ارسال کند. اگر TTFB سایت شما بالای ۶۰۰ میلی‌ثانیه باشد، حتی بهترین بهینه‌سازی‌های ظاهری هم نمی‌تواند سرعت لود را به استاندارد ایده‌آل برساند.
 
-> **نکته کلیدی وپیکا:** برای کاهش TTFB، استفاده از دیتابیس سریع MariaDB، فعال‌سازی کش شیء (Redis / Memcached) و استفاده از آخرین نسخه پایدار PHP 8.2+ توصیه اکید ماست.
+> **نکته کلیدی ردوبز:** برای کاهش TTFB، استفاده از دیتابیس سریع MariaDB، فعال‌سازی کش شیء (Redis / Memcached) و استفاده از آخرین نسخه پایدار PHP 8.2+ توصیه اکید ماست.
 
 ---
 
@@ -295,10 +295,10 @@ img, video {
       }
     ],
     seo: {
-      metaTitle: 'آموزش کامل کانتینر فلکس باکس در المنتور پرو | وپیکا',
+      metaTitle: 'آموزش کامل کانتینر فلکس باکس در المنتور پرو | ردوبز',
       metaDescription: 'یادگیری کانتینرهای فلکس‌باکس در المنتور برای ساخت صفحات پرسرعت و ریسپانسیو با کمترین حجم کد HTML.',
       focusKeyword: 'کانتینر المنتور',
-      canonicalUrl: 'https://vepika.ir/article/elementor-pro-modern-flexbox-containers-mastery',
+      canonicalUrl: 'https://redwebs.ir/article/elementor-pro-modern-flexbox-containers-mastery',
       robotsIndex: true,
       schemaType: 'HowTo',
     },
@@ -316,7 +316,7 @@ img, video {
 
 \`\`\`css
 /* معادل مدرن CSS کانتینرهای المنتور */
-.vepika-card-container {
+.redwebs-card-container {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -325,7 +325,7 @@ img, video {
 }
 
 @media (max-width: 768px) {
-  .vepika-card-container {
+  .redwebs-card-container {
     flex-direction: column;
     align-items: stretch;
   }
@@ -363,10 +363,10 @@ img, video {
       bio: 'مشاور رشد بیش از ۵۰ فروشگاه آنلاین معتبر در زمینه بهینه‌سازی قیف فروش و تجربه مشتری.',
     },
     seo: {
-      metaTitle: 'بهینه‌سازی صفحه تسویه حساب ووکامرس | وپیکا',
+      metaTitle: 'بهینه‌سازی صفحه تسویه حساب ووکامرس | ردوبز',
       metaDescription: 'چگونه نرخ تکمیل خرید ووکامرس را تا ۳۵٪ افزایش دهیم؟ آموزش حذف فیلدهای اضافه، تسویه تک مرحله‌ای و اعتمادسازی در فرآیند پرداخت.',
       focusKeyword: 'تسویه حساب ووکامرس',
-      canonicalUrl: 'https://vepika.ir/article/woocommerce-checkout-conversion-rate-optimization',
+      canonicalUrl: 'https://redwebs.ir/article/woocommerce-checkout-conversion-rate-optimization',
       robotsIndex: true,
       schemaType: 'Article',
     },
@@ -385,9 +385,9 @@ img, video {
 /**
  * بهینه‌سازی و حذف فیلدهای اضافه تسویه حساب ووکامرس
  */
-add_filter('woocommerce_checkout_fields', 'vepika_optimize_checkout_fields');
+add_filter('woocommerce_checkout_fields', 'redwebs_optimize_checkout_fields');
 
-function vepika_optimize_checkout_fields($fields) {
+function redwebs_optimize_checkout_fields($fields) {
     // حذف فیلدهای اختیاری که باعث سردرگمی مشتری می‌شوند
     unset($fields['billing']['billing_company']);
     unset($fields['billing']['billing_address_2']);
@@ -436,10 +436,10 @@ function vepika_optimize_checkout_fields($fields) {
       bio: 'بیش از یک دهه فعالیت در توسعه وب مدرن، بهینه‌سازی دیتابیس‌های پرترافیک و معماری سایت‌های بدون لگ.',
     },
     seo: {
-      metaTitle: 'آموزش اسکیما مارک‌آپ و سئو تکنیکال وردپرس | وپیکا',
+      metaTitle: 'آموزش اسکیما مارک‌آپ و سئو تکنیکال وردپرس | ردوبز',
       metaDescription: 'راهنمای جامع پیاده‌سازی داده‌های ساختاریافته JSON-LD در وردپرس برای کسب ستاره‌ها و بخش‌های متمایز ریچ اسنیپت در نتایج جستجوی گوگل.',
       focusKeyword: 'اسکیما وردپرس',
-      canonicalUrl: 'https://vepika.ir/article/technical-seo-schema-markup-rankmath-guide',
+      canonicalUrl: 'https://redwebs.ir/article/technical-seo-schema-markup-rankmath-guide',
       robotsIndex: true,
       schemaType: 'TechArticle',
     },
@@ -467,7 +467,7 @@ function vepika_optimize_checkout_fields($fields) {
 }
 \`\`\`
 
-وپیکا این اسکیماها را به صورت خودکار برای تمامی مقالات و آموزش‌ها تولید کرده و در هدر صفحات تزریق می‌نماید.
+ردوبز این اسکیماها را به صورت خودکار برای تمامی مقالات و آموزش‌ها تولید کرده و در هدر صفحات تزریق می‌نماید.
     `
   },
   {
@@ -497,10 +497,10 @@ function vepika_optimize_checkout_fields($fields) {
       bio: 'بیش از یک دهه فعالیت در توسعه وب مدرن، بهینه‌سازی دیتابیس‌های پرترافیک و معماری سایت‌های بدون لگ.',
     },
     seo: {
-      metaTitle: '۱۰ اسنیپت کاربردی functions.php وردپرس | وپیکا',
+      metaTitle: '۱۰ اسنیپت کاربردی functions.php وردپرس | ردوبز',
       metaDescription: 'مجموعه کدهای آماده و بدون باگ برای فایل فانکشنز وردپرس جهت افزایش امنیت، سرعت و حذف افزونه‌های اضافه.',
       focusKeyword: 'اسنیپت functions.php',
-      canonicalUrl: 'https://vepika.ir/article/essential-wordpress-functions-php-snippets',
+      canonicalUrl: 'https://redwebs.ir/article/essential-wordpress-functions-php-snippets',
       robotsIndex: true,
       schemaType: 'TechArticle',
     },
@@ -520,7 +520,7 @@ add_filter('the_generator', '__return_empty_string');
 ### ۲. غیرفعال‌سازی اسکریپت‌های سنگین ایموجی
 
 \`\`\`php
-function vepika_disable_emojis() {
+function redwebs_disable_emojis() {
     remove_action('wp_head', 'print_emoji_detection_script', 7);
     remove_action('admin_print_scripts', 'print_emoji_detection_script');
     remove_action('wp_print_styles', 'print_emoji_styles');
@@ -529,7 +529,7 @@ function vepika_disable_emojis() {
     remove_filter('comment_text_rss', 'wp_staticize_emoji');
     remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
 }
-add_action('init', 'vepika_disable_emojis');
+add_action('init', 'redwebs_disable_emojis');
 \`\`\`
     `
   },
@@ -559,10 +559,10 @@ add_action('init', 'vepika_disable_emojis');
       bio: 'علاقه‌مند به خلق تجربیات دیجیتال کاربرپسند، استانداردهای طراحی مینیمال و سیستم‌های دیزاین واکنش‌گرا.',
     },
     seo: {
-      metaTitle: 'اصول تایپوگرافی فارسی در وب مدرن | وپیکا',
+      metaTitle: 'اصول تایپوگرافی فارسی در وب مدرن | ردوبز',
       metaDescription: 'آموزش جامع پیاده‌سازی تایپوگرافی استاندارد فارسی در طراحی سایت با فرمت WOFF2 و رعایت فواصل خوانایی.',
       focusKeyword: 'تایپوگرافی فارسی وب',
-      canonicalUrl: 'https://vepika.ir/article/modern-persian-web-typography-system-guidelines',
+      canonicalUrl: 'https://redwebs.ir/article/modern-persian-web-typography-system-guidelines',
       robotsIndex: true,
       schemaType: 'Article',
     },
@@ -576,7 +576,7 @@ add_action('init', 'vepika_disable_emojis');
 همیشه از فرمت مدرن **WOFF2** استفاده کنید که با الگوریتم فشرده‌سازی Brotli حجم فونت را تا ۳۰٪ نسبت به WOFF معمولی کاهش می‌دهد. همچنین با حذف گلیف‌های غیرضروری زبان‌های دیگر، فایل نهایی فونت معمولاً به کمتر از ۳۰ کیلوبایت می‌رسد.
 
 \`\`\`css
-/* استانداردهای طلایی تایپوگرافی وپیکا */
+/* استانداردهای طلایی تایپوگرافی ردوبز */
 body {
   font-family: 'Vazirmatn', system-ui, sans-serif;
   line-height: 1.85;
@@ -595,7 +595,7 @@ export const INITIAL_COMMENTS: Comment[] = [
     authorName: 'محمدرضا کیانی',
     authorEmail: 'm.kiani@gmail.com',
     authorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
-    content: 'مقاله فوق‌العاده کاربردی و دقیقی بود! بعد از کانفیگ Redis طبق راهنمای وپیکا، لود صفحه محصول فروشگاهم از ۴ ثانیه به ۱.۱ ثانیه رسید. خسته نباشید به تیم پرتوان وپیکا.',
+    content: 'مقاله فوق‌العاده کاربردی و دقیقی بود! بعد از کانفیگ Redis طبق راهنمای ردوبز، لود صفحه محصول فروشگاهم از ۴ ثانیه به ۱.۱ ثانیه رسید. خسته نباشید به تیم پرتوان ردوبز.',
     createdAt: '2026-08-14T10:15:00Z',
     status: 'approved',
     likes: 18,
@@ -603,7 +603,7 @@ export const INITIAL_COMMENTS: Comment[] = [
       {
         id: 'rep-1',
         authorName: 'آریا رادمنش',
-        authorRole: 'مدیر محتوای وپیکا',
+        authorRole: 'مدیر محتوای ردوبز',
         authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
         content: 'بسیار خوشحالیم که این راهکار برای فروشگاه شما اثربخش بوده محمدرضا عزیز. موفق و پرفروش باشید!',
         createdAt: '2026-08-14T11:00:00Z',
@@ -635,24 +635,24 @@ export const INITIAL_COMMENTS: Comment[] = [
 ];
 
 export const INITIAL_SETTINGS: SiteSettings = {
-  siteTitle: 'وپیکا | رسانه تخصصی آموزش وردپرس، توسعه و طراحی وب',
+  siteTitle: 'ردوبز | رسانه تخصصی آموزش وردپرس، توسعه و طراحی وب',
   siteTagline: 'یاد بگیرید. بسازید. رشد کنید.',
-  siteDescription: 'وپیکا (Vepika) — پلتفرم تخصصی و مستقل آموزش وردپرس، توسعه وب، المنتور، ووکامرس، سئو و ابزارهای کاربردی وب به زبان فارسی.',
-  siteUrl: 'https://vepika.ir',
-  authorName: 'تیم مهندسی و تحریریه وپیکا',
+  siteDescription: 'ردوبز (Redwebs) — پلتفرم تخصصی و مستقل آموزش وردپرس، توسعه وب، المنتور، ووکامرس، سئو و ابزارهای کاربردی وب به زبان فارسی.',
+  siteUrl: 'https://redwebs.ir',
+  authorName: 'تیم مهندسی و تحریریه ردوبز',
   authorRole: 'رسانه تخصصی توسعه و مدیریت وب‌سایت',
-  authorBio: 'هدف وپیکا ارتقای دانش فنی وب‌مسترها، طراحان و برنامه‌نویسان فارسی‌زبان با آموزش‌های کاربردی، عمیق و به‌روز است.',
+  authorBio: 'هدف ردوبز ارتقای دانش فنی وب‌مسترها، طراحان و برنامه‌نویسان فارسی‌زبان با آموزش‌های کاربردی، عمیق و به‌روز است.',
   authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
   defaultOgImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&auto=format&fit=crop&q=80',
   enableComments: true,
   autoApproveComments: false,
   postsPerPage: 9,
-  headerLogoText: 'وپیکـا',
-  footerText: 'تمامی حقوق مادی و معنوی برای رسانه مستقل وپیکا (Vepika) محفوظ است. تولید شده با اشتیاق برای جامعه وب فارسی.',
-  contactEmail: 'hello@vepika.ir',
-  telegramUsername: 'vepika_ir',
-  githubUrl: 'https://github.com/vepika',
-  twitterUrl: 'https://twitter.com/vepika_ir',
-  instagramUrl: 'https://instagram.com/vepika_ir',
-  youtubeUrl: 'https://youtube.com/@vepika_ir',
+  headerLogoText: 'ردوبز',
+  footerText: 'تمامی حقوق مادی و معنوی برای رسانه مستقل ردوبز (Redwebs) محفوظ است. تولید شده با اشتیاق برای جامعه وب فارسی.',
+  contactEmail: 'hello@redwebs.ir',
+  telegramUsername: 'redwebs_ir',
+  githubUrl: 'https://github.com/redwebs',
+  twitterUrl: 'https://twitter.com/redwebs_ir',
+  instagramUrl: 'https://instagram.com/redwebs_ir',
+  youtubeUrl: 'https://youtube.com/@redwebs_ir',
 };

@@ -1,10 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  INITIAL_ARTICLES,
-  INITIAL_CATEGORIES,
-  INITIAL_COMMENTS,
-  INITIAL_SETTINGS,
-} from './data/initialData';
 import { Article, Category, Comment, SiteSettings, ViewMode, AdminTab } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -17,44 +11,25 @@ import { DesignSystemView } from './components/DesignSystemView';
 import { SearchModal } from './components/SearchModal';
 import { BookmarksDrawer } from './components/BookmarksDrawer';
 import { AdminLayout } from './components/admin/AdminLayout';
+import { AdminLogin } from './components/admin/AdminLogin';
+import { api } from './utils/api';
 import { generateArticleSchema, generateWebsiteSchema } from './utils/schemaGenerator';
 
-const DATA_VERSION = 'vepika_v1_0';
+type AuthState = 'checking' | 'authed' | 'anon';
 
 export function App() {
-  // Persistence state with auto-migration to Vepika branding
-  const [articles, setArticles] = useState<Article[]>(() => {
-    const version = localStorage.getItem('vepika_version');
-    if (version !== DATA_VERSION) {
-      localStorage.setItem('vepika_version', DATA_VERSION);
-      localStorage.setItem('vepika_articles', JSON.stringify(INITIAL_ARTICLES));
-      localStorage.setItem('vepika_categories', JSON.stringify(INITIAL_CATEGORIES));
-      localStorage.setItem('vepika_comments', JSON.stringify(INITIAL_COMMENTS));
-      localStorage.setItem('vepika_settings', JSON.stringify(INITIAL_SETTINGS));
-      return INITIAL_ARTICLES;
-    }
-    const saved = localStorage.getItem('vepika_articles');
-    return saved ? JSON.parse(saved) : INITIAL_ARTICLES;
-  });
+  // Server-backed content state
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const saved = localStorage.getItem('vepika_categories');
-    return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
-  });
-
-  const [comments, setComments] = useState<Comment[]>(() => {
-    const saved = localStorage.getItem('vepika_comments');
-    return saved ? JSON.parse(saved) : INITIAL_COMMENTS;
-  });
-
-  const [settings, setSettings] = useState<SiteSettings>(() => {
-    const saved = localStorage.getItem('vepika_settings');
-    return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
-  });
-
+  // Bookmarks stay client-side (per-visitor preference, no reader accounts)
   const [bookmarks, setBookmarks] = useState<string[]>(() => {
-    const saved = localStorage.getItem('vepika_bookmarks');
-    return saved ? JSON.parse(saved) : ['art-1', 'art-2'];
+    const saved = localStorage.getItem('redwebs_bookmarks');
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Navigation & View state
@@ -65,34 +40,55 @@ export function App() {
   // Admin state
   const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
   const [adminTabParams, setAdminTabParams] = useState<any>(null);
+  const [authState, setAuthState] = useState<AuthState>('checking');
 
   // Modals & Drawers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
 
-  // Sync to localStorage
-  useEffect(() => {
-    localStorage.setItem('vepika_articles', JSON.stringify(articles));
-  }, [articles]);
+  // Initial content load from the API
+  const loadAllContent = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const [articlesData, categoriesData, commentsData, settingsData] = await Promise.all([
+        api.get('/articles?all=1'),
+        api.get('/categories'),
+        api.get('/comments'),
+        api.get('/settings'),
+      ]);
+      setArticles(articlesData);
+      setCategories(categoriesData);
+      setComments(commentsData);
+      setSettings(settingsData);
+    } catch (err: any) {
+      setLoadError(err.message || 'خطا در بارگذاری اطلاعات سایت');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem('vepika_categories', JSON.stringify(categories));
-  }, [categories]);
+    loadAllContent();
+  }, []);
+
+  // Check admin session whenever the admin panel is opened
+  useEffect(() => {
+    if (viewMode !== 'admin' || authState === 'authed') return;
+    setAuthState('checking');
+    api
+      .get('/auth/me')
+      .then(() => setAuthState('authed'))
+      .catch(() => setAuthState('anon'));
+  }, [viewMode]);
 
   useEffect(() => {
-    localStorage.setItem('vepika_comments', JSON.stringify(comments));
-  }, [comments]);
-
-  useEffect(() => {
-    localStorage.setItem('vepika_settings', JSON.stringify(settings));
-  }, [settings]);
-
-  useEffect(() => {
-    localStorage.setItem('vepika_bookmarks', JSON.stringify(bookmarks));
+    localStorage.setItem('redwebs_bookmarks', JSON.stringify(bookmarks));
   }, [bookmarks]);
 
   // Inject Dynamic SEO & Schema JSON-LD into Document Head
   useEffect(() => {
+    if (!settings) return;
     const existingScript = document.getElementById('dynamic-jsonld-schema');
     if (existingScript) {
       existingScript.remove();
@@ -110,13 +106,11 @@ export function App() {
         script.text = JSON.stringify(schema);
         document.head.appendChild(script);
 
-        // Update Document Title
         document.title = currentArt.seo.metaTitle || `${currentArt.title} | ${settings.siteTitle}`;
         return;
       }
     }
 
-    // Default WebSite Schema for Home/Admin
     const homeSchema = generateWebsiteSchema(settings);
     script.text = JSON.stringify(homeSchema);
     document.head.appendChild(script);
@@ -126,7 +120,7 @@ export function App() {
     } else if (viewMode === 'toolkit') {
       document.title = `جعبه ابزار و اسنیپت‌های مهندسی وب | ${settings.siteTitle}`;
     } else if (viewMode === 'design-system') {
-      document.title = `سیستم دیزاین برند وپیکا | ${settings.siteTitle}`;
+      document.title = `سیستم دیزاین برند ردوبز | ${settings.siteTitle}`;
     } else if (viewMode === 'categories-index') {
       document.title = `دسته‌بندی‌های تخصصی آموزش وب و وردپرس | ${settings.siteTitle}`;
     } else if (viewMode === 'category' && selectedCategoryId) {
@@ -146,36 +140,29 @@ export function App() {
   };
 
   // Handler: Like Article
-  const handleLikeArticle = (id: string) => {
-    setArticles((prev) =>
-      prev.map((art) => (art.id === id ? { ...art, likesCount: art.likesCount + 1 } : art))
-    );
+  const handleLikeArticle = async (id: string) => {
+    const { likesCount } = await api.post(`/articles/${id}/like`);
+    setArticles((prev) => prev.map((a) => (a.id === id ? { ...a, likesCount } : a)));
   };
 
   // Handler: Add Comment
-  const handleAddComment = (commentData: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => {
-    const newComment: Comment = {
-      ...commentData,
-      id: `comment-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-    };
+  const handleAddComment = async (commentData: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => {
+    const newComment = await api.post('/comments', commentData);
     setComments((prev) => [newComment, ...prev]);
   };
 
   // Handler: Like Comment
-  const handleLikeComment = (commentId: string) => {
-    setComments((prev) =>
-      prev.map((c) => (c.id === commentId ? { ...c, likes: c.likes + 1 } : c))
-    );
+  const handleLikeComment = async (commentId: string) => {
+    const { likes } = await api.post(`/comments/${commentId}/like`);
+    setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, likes } : c)));
   };
 
   // Handler: Select Article for Reading
   const handleSelectArticle = (article: Article) => {
-    // Increment view count
     setArticles((prev) =>
       prev.map((a) => (a.id === article.id ? { ...a, viewsCount: (a.viewsCount || 0) + 1 } : a))
     );
+    api.post(`/articles/${article.id}/view`).catch(() => {});
     setSelectedArticleId(article.id);
     setViewMode('article');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -193,105 +180,83 @@ export function App() {
   };
 
   // Admin Actions
-  const handleSaveArticle = (saved: Article) => {
-    setArticles((prev) => {
-      const exists = prev.some((a) => a.id === saved.id);
-      if (exists) {
-        return prev.map((a) => (a.id === saved.id ? saved : a));
-      }
-      return [saved, ...prev];
-    });
+  const handleSaveArticle = async (saved: Article) => {
+    const exists = articles.some((a) => a.id === saved.id);
+    if (exists) {
+      const updated = await api.put(`/articles/${saved.id}`, saved);
+      setArticles((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+    } else {
+      const created = await api.post('/articles', saved);
+      setArticles((prev) => [created, ...prev]);
+    }
   };
 
-  const handleDeleteArticle = (id: string) => {
+  const handleDeleteArticle = async (id: string) => {
+    await api.del(`/articles/${id}`);
     setArticles((prev) => prev.filter((a) => a.id !== id));
     setComments((prev) => prev.filter((c) => c.postId !== id));
   };
 
-  const handleDuplicateArticle = (article: Article) => {
-    const duplicate: Article = {
-      ...article,
-      id: `post-${Date.now()}`,
-      slug: `${article.slug}-copy-${Date.now().toString().slice(-4)}`,
-      title: `${article.title} (نسخه رونوشت)`,
-      status: 'draft',
-      publishDate: new Date().toISOString(),
-      viewsCount: 0,
-      likesCount: 0,
-    };
+  const handleDuplicateArticle = async (article: Article) => {
+    const duplicate = await api.post(`/articles/${article.id}/duplicate`);
     setArticles((prev) => [duplicate, ...prev]);
   };
 
-  const handleToggleArticleStatus = (id: string) => {
-    setArticles((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? { ...a, status: a.status === 'published' ? 'draft' : 'published' }
-          : a
-      )
-    );
+  const handleToggleArticleStatus = async (id: string) => {
+    const { status } = await api.patch(`/articles/${id}/status`);
+    setArticles((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
   };
 
-  const handleUpdateCommentStatus = (commentId: string, status: any) => {
-    setComments((prev) =>
-      prev.map((c) => (c.id === commentId ? { ...c, status } : c))
-    );
+  const handleUpdateCommentStatus = async (commentId: string, status: any) => {
+    await api.patch(`/comments/${commentId}/status`, { status });
+    setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, status } : c)));
   };
 
-  const handleDeleteComment = (commentId: string) => {
+  const handleDeleteComment = async (commentId: string) => {
+    await api.del(`/comments/${commentId}`);
     setComments((prev) => prev.filter((c) => c.id !== commentId));
   };
 
-  const handleReplyComment = (commentId: string, replyText: string) => {
-    setComments((prev) =>
-      prev.map((c) => {
-        if (c.id === commentId) {
-          const replies = c.replies || [];
-          return {
-            ...c,
-            replies: [
-              ...replies,
-              {
-                id: `reply-${Date.now()}`,
-                authorName: settings.authorName || 'تحریریه وپیکا',
-                authorRole: 'مدیر محتوا',
-                content: replyText,
-                createdAt: new Date().toISOString(),
-              },
-            ],
-          };
-        }
-        return c;
-      })
-    );
+  const handleReplyComment = async (commentId: string, replyText: string) => {
+    const updated = await api.post(`/comments/${commentId}/reply`, { content: replyText });
+    setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)));
   };
 
-  const handleSaveCategory = (category: Category) => {
-    setCategories((prev) => {
-      const exists = prev.some((c) => c.id === category.id);
-      if (exists) {
-        return prev.map((c) => (c.id === category.id ? category : c));
-      }
-      return [...prev, category];
-    });
+  const handleSaveCategory = async (category: Category) => {
+    const exists = categories.some((c) => c.id === category.id);
+    if (exists) {
+      const updated = await api.put(`/categories/${category.id}`, category);
+      setCategories((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    } else {
+      const created = await api.post('/categories', category);
+      setCategories((prev) => [...prev, created]);
+    }
   };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    const fallbackCategory = categories.find((c) => c.id !== categoryId);
-    if (!fallbackCategory) return;
-
-    setCategories((prev) => prev.filter((c) => c.id !== categoryId));
-    // Reassign orphaned articles to fallback
-    setArticles((prev) =>
-      prev.map((a) => (a.categoryId === categoryId ? { ...a, categoryId: fallbackCategory.id } : a))
-    );
+  const handleDeleteCategory = async (categoryId: string) => {
+    await api.del(`/categories/${categoryId}`);
+    const [freshArticles, freshCategories] = await Promise.all([
+      api.get('/articles?all=1'),
+      api.get('/categories'),
+    ]);
+    setArticles(freshArticles);
+    setCategories(freshCategories);
   };
 
-  const handleImportData = (data: any) => {
-    if (data.articles) setArticles(data.articles);
-    if (data.categories) setCategories(data.categories);
-    if (data.comments) setComments(data.comments);
-    if (data.settings) setSettings(data.settings);
+  const handleSaveSettings = async (updated: SiteSettings) => {
+    const saved = await api.put('/settings', updated);
+    setSettings(saved);
+  };
+
+  const handleImportData = async (data: any) => {
+    await api.post('/backup/import', data);
+    await loadAllContent();
+  };
+
+  const handleLogout = async () => {
+    await api.post('/auth/logout').catch(() => {});
+    setAuthState('anon');
+    setViewMode('home');
   };
 
   // Selected article for reader view
@@ -318,8 +283,36 @@ export function App() {
     ? categories.find((c) => c.id === selectedCategoryId) || null
     : null;
 
+  if (isLoading || !settings) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]" dir="rtl">
+        {loadError ? (
+          <div className="text-center space-y-3 px-6">
+            <p className="text-rose-600 font-bold text-sm">{loadError}</p>
+            <button
+              onClick={loadAllContent}
+              className="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold cursor-pointer"
+            >
+              تلاش مجدد
+            </button>
+          </div>
+        ) : (
+          <div className="w-10 h-10 border-4 border-slate-200 border-t-red-600 rounded-full animate-spin" />
+        )}
+      </div>
+    );
+  }
+
   // Render Admin View
   if (viewMode === 'admin') {
+    if (authState !== 'authed') {
+      return (
+        <AdminLogin
+          onSuccess={() => setAuthState('authed')}
+        />
+      );
+    }
+
     return (
       <AdminLayout
         currentTab={adminTab}
@@ -333,6 +326,7 @@ export function App() {
           setAdminTabParams(params || null);
         }}
         onExitAdmin={() => setViewMode('home')}
+        onLogout={handleLogout}
         onSaveArticle={handleSaveArticle}
         onDeleteArticle={handleDeleteArticle}
         onDuplicateArticle={handleDuplicateArticle}
@@ -346,7 +340,7 @@ export function App() {
         onReplyComment={handleReplyComment}
         onSaveCategory={handleSaveCategory}
         onDeleteCategory={handleDeleteCategory}
-        onSaveSettings={setSettings}
+        onSaveSettings={handleSaveSettings}
         onImportData={handleImportData}
       />
     );
@@ -354,7 +348,7 @@ export function App() {
 
   // Render Public Website views
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-red-600 selection:text-white">
       {/* Global Header */}
       <Header
         viewMode={viewMode}

@@ -43,7 +43,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <article
       onClick={handleClick}
-      className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-blue-500/80 hover:shadow-2xl hover:shadow-blue-600/15 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 ease-out flex flex-col cursor-pointer transform-gpu will-change-transform"
+      className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-red-500/80 hover:shadow-2xl hover:shadow-red-600/15 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 ease-out flex flex-col cursor-pointer transform-gpu will-change-transform"
       id={`article-card-${article.slug}`}
       dir="rtl"
     >
@@ -62,7 +62,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-slate-900 bg-white/95 backdrop-blur-md shadow-xs border border-slate-200/60">
             <span
               className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: category?.color || '#2563EB' }}
+              style={{ backgroundColor: category?.color || '#DC2626' }}
             />
             <span>{category?.name || 'آموزش'}</span>
           </span>
@@ -76,8 +76,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           }}
           className={`absolute top-3 left-3 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer ${
             isBookmarked
-              ? 'bg-blue-600 text-white shadow-md scale-105'
-              : 'bg-white/90 text-slate-700 hover:bg-white hover:text-blue-600'
+              ? 'bg-red-600 text-white shadow-md scale-105'
+              : 'bg-white/90 text-slate-700 hover:bg-white hover:text-red-600'
           }`}
           title={isBookmarked ? 'حذف از نشان‌ها' : 'نشان کردن مقاله'}
         >
@@ -87,12 +87,12 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
         {/* Badges on Image (Difficulty & Content Type) */}
         <div className="absolute bottom-3 right-3 z-10 flex flex-wrap items-center gap-1.5">
           {article.contentType && (
-            <div className="bg-slate-900/90 text-blue-300 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-[10px] font-bold shadow-xs">
+            <div className="bg-slate-900/90 text-red-300 backdrop-blur-md px-2.5 py-0.5 rounded-lg text-[10px] font-bold shadow-xs">
               {contentTypeLabels[article.contentType]}
             </div>
           )}
           {article.difficulty && (
-            <div className="bg-blue-600/90 text-white backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] font-bold shadow-xs">
+            <div className="bg-red-600/90 text-white backdrop-blur-md px-2 py-0.5 rounded-lg text-[10px] font-bold shadow-xs">
               سطح: {difficultyLabels[article.difficulty]}
             </div>
           )}
@@ -119,14 +119,14 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
             </div>
 
             {article.wpPlugin && (
-              <span className="text-[10px] font-mono font-medium text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 max-w-[130px] truncate">
+              <span className="text-[10px] font-mono font-medium text-red-700 bg-red-50 px-2 py-0.5 rounded-md border border-red-100 max-w-[130px] truncate">
                 {article.wpPlugin}
               </span>
             )}
           </div>
 
           {/* Article Title in Lalezar Font */}
-          <h2 className="font-lalezar text-lg sm:text-xl text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2 tracking-wide">
+          <h2 className="font-lalezar text-lg sm:text-xl text-slate-900 leading-snug group-hover:text-red-600 transition-colors line-clamp-2 tracking-wide">
             {article.title}
           </h2>
 
@@ -173,7 +173,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/20" />
               <span>{toPersianDigits(article.likesCount)}</span>
             </div>
-            <div className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-blue-600 group-hover:text-white group-hover:scale-110 group-hover:-translate-x-0.5 group-hover:shadow-md transition-all duration-300 flex items-center justify-center shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-red-600 group-hover:text-white group-hover:scale-110 group-hover:-translate-x-0.5 group-hover:shadow-md transition-all duration-300 flex items-center justify-center shadow-2xs">
               <ArrowLeft className="w-3.5 h-3.5" />
             </div>
           </div>

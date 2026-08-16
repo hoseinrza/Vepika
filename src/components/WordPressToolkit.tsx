@@ -40,13 +40,13 @@ const WP_SNIPPETS: SnippetItem[] = [
 remove_action('wp_head', 'wp_generator');
 
 // حذف نسخه وردپرس از آدرس فایل‌های CSS و JS لود شده
-function vepika_remove_ver_css_js( $src ) {
+function redwebs_remove_ver_css_js( $src ) {
     if ( strpos( $src, 'ver=' ) )
         $src = remove_query_arg( 'ver', $src );
     return $src;
 }
-add_filter( 'style_loader_src', 'vepika_remove_ver_css_js', 9999 );
-add_filter( 'script_loader_src', 'vepika_remove_ver_css_js', 9999 );`,
+add_filter( 'style_loader_src', 'redwebs_remove_ver_css_js', 9999 );
+add_filter( 'script_loader_src', 'redwebs_remove_ver_css_js', 9999 );`,
     explanation: 'این کد را در انتهای فایل functions.php قالب فعال خود (ترجیحاً چایلدتم) قرار دهید.',
   },
   {
@@ -79,7 +79,7 @@ define('DISALLOW_FILE_EDIT', true);`,
     targetFile: 'functions.php',
     description: 'کاهش ۲ ریکوئست اضافه به سرور و کم کردن حجم خروجی HTML برای افزایش چشمگیر سرعت.',
     code: `// حذف کدهای ایموجی وردپرس برای کاهش ریکوئست و بهینه‌سازی سرعت
-function vepika_cleanup_wp_emojis() {
+function redwebs_cleanup_wp_emojis() {
     remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
     remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
     remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -88,7 +88,7 @@ function vepika_cleanup_wp_emojis() {
     remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
     remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 }
-add_action( 'init', 'vepika_cleanup_wp_emojis' );`,
+add_action( 'init', 'redwebs_cleanup_wp_emojis' );`,
     explanation: 'با قرار دادن این کد در functions.php دیگر فایل‌های سنگین wp-emoji-release.min.js لود نمی‌شوند.',
   },
   {
@@ -217,7 +217,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
 
   // Checklist state in LocalStorage
   const [checkedIds, setCheckedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('vepika_wp_checklist');
+    const saved = localStorage.getItem('redwebs_wp_checklist');
     return saved ? JSON.parse(saved) : ['chk-1', 'chk-2', 'chk-7'];
   });
 
@@ -226,7 +226,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
       ? checkedIds.filter((item) => item !== id)
       : [...checkedIds, id];
     setCheckedIds(updated);
-    localStorage.setItem('vepika_wp_checklist', JSON.stringify(updated));
+    localStorage.setItem('redwebs_wp_checklist', JSON.stringify(updated));
   };
 
   const handleCopyCode = (id: string, codeText: string) => {
@@ -245,11 +245,11 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8" dir="rtl">
       {/* Header Banner */}
       <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-10 border border-slate-800 relative overflow-hidden shadow-xl">
-        <div className="absolute top-0 left-0 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 left-0 w-80 h-80 bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold">
-              <Sparkles className="w-4 h-4 text-blue-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-xs font-bold">
+              <Sparkles className="w-4 h-4 text-red-400" />
               <span>جعبه ابزار و اسنیپت‌های مهندسی وب‌مستر</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold text-white">
@@ -262,7 +262,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
 
           <button
             onClick={onBack}
-            className="self-start md:self-center px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-blue-300 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer border border-slate-700 shadow-xs"
+            className="self-start md:self-center px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-red-300 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer border border-slate-700 shadow-xs"
           >
             <span>بازگشت به سایت</span>
             <ArrowRight className="w-4 h-4" />
@@ -276,7 +276,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
           onClick={() => setActiveTab('snippets')}
           className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'snippets'
-              ? 'bg-blue-600 text-white shadow-md'
+              ? 'bg-red-600 text-white shadow-md'
               : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
           }`}
         >
@@ -288,7 +288,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
           onClick={() => setActiveTab('checklist')}
           className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'checklist'
-              ? 'bg-blue-600 text-white shadow-md'
+              ? 'bg-red-600 text-white shadow-md'
               : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
           }`}
         >
@@ -300,7 +300,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
           onClick={() => setActiveTab('comparison')}
           className={`px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'comparison'
-              ? 'bg-blue-600 text-white shadow-md'
+              ? 'bg-red-600 text-white shadow-md'
               : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
           }`}
         >
@@ -344,12 +344,12 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
               return (
                 <div
                   key={snippet.id}
-                  className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-xs hover:border-blue-500 transition-all"
+                  className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-xs hover:border-red-500 transition-all"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-md">
+                        <span className="text-[11px] font-mono font-bold bg-red-50 text-red-700 border border-red-200 px-2.5 py-0.5 rounded-md">
                           محل قرارگیری: {snippet.targetFile}
                         </span>
                         <span className="text-[11px] text-slate-400">
@@ -367,7 +367,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                       className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 ${
                         isCopied
                           ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          : 'bg-red-600 hover:bg-red-700 text-white'
                       }`}
                     >
                       {isCopied ? (
@@ -392,7 +392,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                   </div>
 
                   <div className="flex items-center gap-2 text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <Info className="w-4 h-4 text-blue-600 shrink-0" />
+                    <Info className="w-4 h-4 text-red-600 shrink-0" />
                     <span>{snippet.explanation}</span>
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-3xl font-black text-blue-600">
+                <span className="text-3xl font-black text-red-600">
                   {toPersianDigits(progressPercent)}٪
                 </span>
               </div>
@@ -424,7 +424,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
             {/* Progress Bar */}
             <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500 rounded-full"
+                className="h-full bg-gradient-to-r from-red-500 to-emerald-500 transition-all duration-500 rounded-full"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -482,7 +482,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
           {/* Comparison 1: Rank Math vs Yoast */}
           <div className="bg-white rounded-3xl border border-slate-200 p-6 space-y-4 shadow-xs">
             <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
-              <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs border border-blue-100">
+              <div className="w-10 h-10 rounded-2xl bg-red-50 text-red-700 flex items-center justify-center font-bold text-xs border border-red-100">
                 SEO
               </div>
               <div>
@@ -496,7 +496,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                 <strong>چرا رنک مث برنده است؟</strong> رنک مث بیش از ۱۵ ماژول کاربردی مانند مانیتورینگ ارورهای ۴۰۴، اسکیما ساز قدرتمند برای انواع مختلف مقالات و محصولات، و پشتیبانی از پروتکل ایندکس آنی (IndexNow) را به صورت رایگان ارائه می‌دهد که در یواست نیازمند خرید افزونه‌های مجزا است.
               </p>
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-[11px] text-slate-600">
-                <span className="font-bold text-slate-900">پیشنهاد فنی وپیکا:</span> برای سایت‌های تازه‌تاسیس و فروشگاهی، نصب <strong>Rank Math SEO</strong> به دلیل سرعت بالاتر و تولید خودکار ساختار اسکیما توصیه می‌شود.
+                <span className="font-bold text-slate-900">پیشنهاد فنی ردوبز:</span> برای سایت‌های تازه‌تاسیس و فروشگاهی، نصب <strong>Rank Math SEO</strong> به دلیل سرعت بالاتر و تولید خودکار ساختار اسکیما توصیه می‌شود.
               </div>
             </div>
           </div>
@@ -518,7 +518,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                 اگر هاست شما دارای وب‌سرور <strong>LiteSpeed</strong> است، پلاگین رسمی LiteSpeed Cache به دلیل هماهنگی در سطح سرور، کش سمت وب‌سرور و اتصال به CDN ابری بسیار سریع‌تر و کاملاً رایگان است. اما اگر هاست شما Nginx یا Apache است، <strong>WP Rocket</strong> بهترین گزینه است.
               </p>
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-[11px] text-slate-600">
-                <span className="font-bold text-slate-900">پیشنهاد فنی وپیکا:</span> تهیه هاست‌های لایت‌اسپید همراه با فعال‌سازی کش اشیاء Redis بالاترین امتیاز Core Web Vitals را به ارمغان می‌آورد.
+                <span className="font-bold text-slate-900">پیشنهاد فنی ردوبز:</span> تهیه هاست‌های لایت‌اسپید همراه با فعال‌سازی کش اشیاء Redis بالاترین امتیاز Core Web Vitals را به ارمغان می‌آورد.
               </div>
             </div>
           </div>
@@ -540,7 +540,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                 المنتور با معماری جدید Flexbox Container دست طراح را برای ساخت صفحات فرود (Landing Pages)، هدر و فوترهای داینامیک و انیمیشن‌های تعاملی کاملاً باز می‌گذارد. ویرایشگر بلوکی گوتنبرگ نیز برای نگارش مقالات متنی سرعت و تمیزی کد فوق‌العاده‌ای دارد.
               </p>
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-[11px] text-slate-600">
-                <span className="font-bold text-slate-900">پیشنهاد فنی وپیکا:</span> ترکیب طراحی لندینگ‌ها با کانتینرهای المنتور و انتشار پست‌های بلاگ با گوتنبرگ استاندارد بهترین راندمان را می‌دهد.
+                <span className="font-bold text-slate-900">پیشنهاد فنی ردوبز:</span> ترکیب طراحی لندینگ‌ها با کانتینرهای المنتور و انتشار پست‌های بلاگ با گوتنبرگ استاندارد بهترین راندمان را می‌دهد.
               </div>
             </div>
           </div>
@@ -562,7 +562,7 @@ export const WordPressToolkit: React.FC<WordPressToolkitProps> = ({ onBack }) =>
                 اگر محصول فیزیکی (پوشاک، تجهیزات، کتاب چاپی) می‌فروشید، ووکامرس به دلیل مدیریت انبار، روش‌های ارسال پستی و تنوع درگاه‌های بانکی الزامی است. اما اگر صرفاً فایل‌های دانلودی، پادکست و دوره آموزشی می‌فروشید، EDD بسیار سبک‌تر است.
               </p>
               <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-[11px] text-slate-600">
-                <span className="font-bold text-slate-900">پیشنهاد فنی وپیکا:</span> برای فروشگاه‌های جامع، ووکامرس را با تسویه حساب تک‌مرحله‌ای و غیرفعال‌سازی اسکریپت‌های غیرضروری راه‌اندازی نمایید.
+                <span className="font-bold text-slate-900">پیشنهاد فنی ردوبز:</span> برای فروشگاه‌های جامع، ووکامرس را با تسویه حساب تک‌مرحله‌ای و غیرفعال‌سازی اسکریپت‌های غیرضروری راه‌اندازی نمایید.
               </div>
             </div>
           </div>

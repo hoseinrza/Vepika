@@ -127,6 +127,7 @@ export interface SiteSettings {
   twitterUrl?: string;
   instagramUrl?: string;
   youtubeUrl?: string;
+  googleSiteVerification?: string;
 }
 
 export interface SeoCheckItem {

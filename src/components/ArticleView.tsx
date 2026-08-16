@@ -194,7 +194,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   const headings = extractHeadings(article.content);
 
-  // Render markdown with custom Vepika typography
+  // Render markdown with custom Redwebs typography
   const renderMarkdown = (content: string) => {
     const paragraphs = content.split('\n\n');
     return paragraphs.map((block, index) => {
@@ -207,7 +207,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         const id = encodeURIComponent(text.replace(/[*_`]/g, '').trim());
         return (
           <h2 key={index} id={id} className="scroll-mt-24 font-lalezar text-xl sm:text-3xl text-slate-900 flex items-center gap-2 pt-6 pb-2 border-b border-slate-100 tracking-wide">
-            <span className="w-2.5 h-6 rounded-md bg-blue-600 inline-block"></span>
+            <span className="w-2.5 h-6 rounded-md bg-red-600 inline-block"></span>
             <span>{text}</span>
           </h2>
         );
@@ -227,7 +227,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       // Blockquote
       if (trimmed.startsWith('> ')) {
         return (
-          <blockquote key={index} className="border-r-4 border-blue-600 pr-4 py-3 my-5 bg-blue-50/80 rounded-l-xl text-blue-950">
+          <blockquote key={index} className="border-r-4 border-red-600 pr-4 py-3 my-5 bg-red-50/80 rounded-l-xl text-red-950">
             <p className="font-medium text-sm leading-relaxed">{trimmed.replace('> ', '')}</p>
           </blockquote>
         );
@@ -243,7 +243,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         return (
           <div key={index} className="my-6 rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-md">
             <div className="bg-slate-950 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
-              <span className="text-xs font-mono text-blue-400 font-bold uppercase tracking-wider">{firstLine}</span>
+              <span className="text-xs font-mono text-red-400 font-bold uppercase tracking-wider">{firstLine}</span>
               <button
                 onClick={() => handleCopyCode(code, codeId)}
                 className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-mono flex items-center gap-1.5 transition-colors cursor-pointer"
@@ -316,7 +316,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
     <div className="min-h-screen pb-16" dir="rtl">
       {/* Sticky Reading Progress Indicator */}
       <div
-        className="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-50 transition-all duration-150"
+        className="fixed top-0 left-0 right-0 h-1 bg-red-600 z-50 transition-all duration-150"
         style={{ width: `${scrollProgress}%` }}
       />
 
@@ -327,13 +327,13 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={onBack}
-              className="text-slate-700 hover:text-blue-600 font-bold transition-colors cursor-pointer flex items-center gap-1.5"
+              className="text-slate-700 hover:text-red-600 font-bold transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <ArrowRight className="w-4 h-4" />
               <span>خانه</span>
             </button>
             <span>/</span>
-            <span className="text-blue-600 font-bold">{category?.name || 'آموزش'}</span>
+            <span className="text-red-600 font-bold">{category?.name || 'آموزش'}</span>
             <span>/</span>
             <span className="text-slate-400 truncate max-w-[200px] sm:max-w-xs">{article.title}</span>
           </div>
@@ -342,7 +342,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             {/* Schema Inspector Modal Trigger */}
             <button
               onClick={() => setShowSchemaModal(true)}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
+              className="px-3 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
               title="مشاهده کدهای اسکیما JSON-LD گوگل"
             >
               <Code className="w-3.5 h-3.5" />
@@ -354,8 +354,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               onClick={(e) => onToggleBookmark(article.id, e)}
               className={`p-2 rounded-xl transition-all cursor-pointer border ${
                 isBookmarked
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                  : 'bg-white text-slate-700 hover:text-blue-600 border-slate-200'
+                  ? 'bg-red-600 text-white border-red-600 shadow-xs'
+                  : 'bg-white text-slate-700 hover:text-red-600 border-slate-200'
               }`}
               title={isBookmarked ? 'حذف از نشان‌ها' : 'نشان کردن مقاله'}
             >
@@ -369,13 +369,13 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className="px-3 py-1 rounded-full text-xs font-bold text-white shadow-xs"
-              style={{ backgroundColor: category?.color || '#2563EB' }}
+              style={{ backgroundColor: category?.color || '#DC2626' }}
             >
               {category?.name || 'آموزش تخصصی'}
             </span>
 
             {article.difficulty && (
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
                 سطح: {article.difficulty === 'intermediate' ? 'متوسط' : article.difficulty === 'beginner' ? 'مقدماتی' : 'پیشرفته'}
               </span>
             )}
@@ -387,11 +387,11 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             )}
 
             {/* Dynamic Calculated Reading Time Pill */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50/90 text-blue-700 border border-blue-200/90 shadow-2xs">
-              <Clock className="w-3.5 h-3.5 text-blue-600 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50/90 text-red-700 border border-red-200/90 shadow-2xs">
+              <Clock className="w-3.5 h-3.5 text-red-600 animate-pulse" />
               <span>زمان تخمینی مطالعه: {toPersianDigits(readingStats.readingTime)} دقیقه</span>
-              <span className="text-blue-300">|</span>
-              <span className="text-[11px] font-medium text-blue-600">
+              <span className="text-red-300">|</span>
+              <span className="text-[11px] font-medium text-red-600">
                 ({toPersianDigits(readingStats.wordCount)} کلمه)
               </span>
             </span>
@@ -401,7 +401,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             {article.title}
           </h1>
 
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify bg-slate-50 p-4 rounded-2xl border-r-4 border-blue-600 border-y border-l border-slate-200">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify bg-slate-50 p-4 rounded-2xl border-r-4 border-red-600 border-y border-l border-slate-200">
             {article.excerpt}
           </p>
 
@@ -422,7 +422,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
             <div className="flex items-center gap-3 sm:gap-4 text-xs text-slate-500">
               <span className="flex items-center gap-1 text-slate-700 font-medium">
-                <Clock className="w-4 h-4 text-blue-600" />
+                <Clock className="w-4 h-4 text-red-600" />
                 <span>{toPersianDigits(readingStats.readingTime)} دقیقه مطالعه</span>
               </span>
               <span>•</span>
@@ -455,15 +455,15 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-10">
           {/* Prerequisites (if available) */}
           {article.prerequisites && article.prerequisites.length > 0 && (
-            <div className="md:col-span-5 bg-blue-50/80 p-5 rounded-2xl border border-blue-200 space-y-3">
-              <div className="flex items-center gap-2 text-blue-900 font-bold text-xs sm:text-sm">
-                <Info className="w-4 h-4 text-blue-600" />
+            <div className="md:col-span-5 bg-red-50/80 p-5 rounded-2xl border border-red-200 space-y-3">
+              <div className="flex items-center gap-2 text-red-900 font-bold text-xs sm:text-sm">
+                <Info className="w-4 h-4 text-red-600" />
                 <span>پیش‌نیازهای این آموزش</span>
               </div>
-              <ul className="space-y-1.5 text-xs text-blue-950">
+              <ul className="space-y-1.5 text-xs text-red-950">
                 {article.prerequisites.map((req, idx) => (
                   <li key={idx} className="flex items-start gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-1.5 shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0" />
                     <span>{req}</span>
                   </li>
                 ))}
@@ -475,7 +475,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           {headings.length > 0 && (
             <div className={`${article.prerequisites ? 'md:col-span-7' : 'md:col-span-12'} bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3`}>
               <div className="flex items-center gap-2 text-slate-900 font-bold text-xs sm:text-sm">
-                <ListOrdered className="w-4 h-4 text-blue-600" />
+                <ListOrdered className="w-4 h-4 text-red-600" />
                 <span>سرفصل‌ها و عناوین مقاله</span>
               </div>
               <ul className="space-y-1.5 text-xs">
@@ -483,9 +483,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   <li key={idx} className={h.level === 3 ? 'pr-4' : ''}>
                     <a
                       href={`#${h.id}`}
-                      className="text-slate-700 hover:text-blue-600 hover:underline transition-colors flex items-center gap-1.5"
+                      className="text-slate-700 hover:text-red-600 hover:underline transition-colors flex items-center gap-1.5"
                     >
-                      <span className="text-blue-500 font-bold">•</span>
+                      <span className="text-red-500 font-bold">•</span>
                       <span>{h.text}</span>
                     </a>
                   </li>
@@ -501,14 +501,14 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                  <CheckCircle2 className="w-5 h-5 text-red-600" />
                   <span>مراحل گام‌به‌گام پیاده‌سازی</span>
                 </h3>
                 <p className="text-xs text-slate-500">
                   پیشرفت خود را با زدن تیک هر مرحله ذخیره کنید.
                 </p>
               </div>
-              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+              <span className="text-xs font-bold text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100">
                 {toPersianDigits(completedSteps.length)} از {toPersianDigits(article.tutorialSteps.length)} مرحله
               </span>
             </div>
@@ -563,7 +563,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         )}
 
         {/* Main Article Body Markdown */}
-        <div className={`prose-vepika ${getFontSizeClass()}`}>
+        <div className={`prose-redwebs ${getFontSizeClass()}`}>
           {renderMarkdown(article.content)}
         </div>
 
@@ -571,7 +571,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         {article.seo.faqItems && article.seo.faqItems.length > 0 && (
           <section className="my-12 bg-slate-50 rounded-3xl p-6 sm:p-8 border border-slate-200 space-y-4">
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 pb-2 border-b border-slate-200">
-              <HelpCircle className="w-5 h-5 text-blue-600" />
+              <HelpCircle className="w-5 h-5 text-red-600" />
               <span>پرسش‌های متداول (FAQ)</span>
             </h3>
             <div className="space-y-3">
@@ -581,7 +581,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   <div key={faq.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
                     <button
                       onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                      className="w-full p-4 text-right flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-slate-900 hover:text-blue-600 transition-colors cursor-pointer"
+                      className="w-full p-4 text-right flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-slate-900 hover:text-red-600 transition-colors cursor-pointer"
                     >
                       <span>{faq.question}</span>
                       {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -638,7 +638,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 key={size}
                 onClick={() => setFontSize(size)}
                 className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  fontSize === size ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  fontSize === size ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
                 {size === 'normal' ? 'A' : size === 'large' ? 'A+' : 'A++'}
@@ -653,12 +653,12 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             src={article.author.avatar}
             alt={article.author.name}
             referrerPolicy="no-referrer"
-            className="w-20 h-20 rounded-2xl object-cover border-2 border-blue-500 shadow-md shrink-0"
+            className="w-20 h-20 rounded-2xl object-cover border-2 border-red-500 shadow-md shrink-0"
           />
           <div className="space-y-2 text-center sm:text-right">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h3 className="font-extrabold text-base text-slate-900">{article.author.name}</h3>
-              <span className="text-[11px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md border border-blue-100">
+              <span className="text-[11px] font-bold bg-red-50 text-red-700 px-2 py-0.5 rounded-md border border-red-100">
                 {article.author.role}
               </span>
             </div>
@@ -670,7 +670,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         {relatedArticles.length > 0 && (
           <section className="my-14 space-y-6">
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-blue-600" />
+              <Sparkles className="w-5 h-5 text-red-600" />
               <span>آموزش‌های مرتبط با این مبحث</span>
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -678,7 +678,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 <div
                   key={rel.id}
                   onClick={() => onSelectArticle(rel)}
-                  className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-blue-500 transition-all cursor-pointer flex gap-4 group shadow-2xs"
+                  className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-red-500 transition-all cursor-pointer flex gap-4 group shadow-2xs"
                 >
                   <img
                     src={rel.coverImage}
@@ -687,7 +687,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     className="w-24 h-24 rounded-xl object-cover shrink-0"
                   />
                   <div className="space-y-2 flex-1 flex flex-col justify-between">
-                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-red-600 transition-colors line-clamp-2">
                       {rel.title}
                     </h4>
                     <span className="text-[11px] text-slate-500 flex items-center gap-1">
@@ -705,7 +705,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         <section className="my-14 space-y-8" id="comments">
           <div className="flex items-center justify-between pb-4 border-b border-slate-200">
             <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-600" />
+              <MessageSquare className="w-5 h-5 text-red-600" />
               <span>دیدگاه‌ها و پرسش‌های کاربران ({toPersianDigits(postComments.length)})</span>
             </h3>
           </div>
@@ -720,7 +720,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                 <span>
                   {settings.autoApproveComments
                     ? 'دیدگاه شما با موفقیت منتشر گردید.'
-                    : 'دیدگاه شما با موفقیت ثبت شد و پس از بازبینی تیم فنی وپیکا منتشر خواهد شد.'}
+                    : 'دیدگاه شما با موفقیت ثبت شد و پس از بازبینی تیم فنی ردوبز منتشر خواهد شد.'}
                 </span>
               </div>
             ) : (
@@ -732,7 +732,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     placeholder="نام و نام خانوادگی *"
                     value={authorName}
                     onChange={(e) => setAuthorName(e.target.value)}
-                    className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
+                    className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-red-600 focus:bg-white transition-all"
                   />
                   <input
                     type="email"
@@ -740,7 +740,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     placeholder="ایمیل شما (محفوظ می‌ماند) *"
                     value={authorEmail}
                     onChange={(e) => setAuthorEmail(e.target.value)}
-                    className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all dir-ltr text-left"
+                    className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-red-600 focus:bg-white transition-all dir-ltr text-left"
                   />
                 </div>
                 <textarea
@@ -749,11 +749,11 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                   placeholder="دیدگاه، پرسش فنی یا تجربه خود از پیاده‌سازی این آموزش را بنویسید..."
                   value={commentContent}
                   onChange={(e) => setCommentContent(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 focus:outline-hidden focus:border-red-600 focus:bg-white transition-all"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
+                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer shadow-xs"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>ارسال دیدگاه</span>
@@ -786,7 +786,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
                     <button
                       onClick={() => onLikeComment(comment.id)}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-1 cursor-pointer"
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors flex items-center gap-1 cursor-pointer"
                     >
                       <ThumbsUp className="w-3.5 h-3.5" />
                       <span>{toPersianDigits(comment.likes)}</span>
@@ -797,13 +797,13 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
                   {/* Replies if any */}
                   {comment.replies && comment.replies.length > 0 && (
-                    <div className="mr-6 pr-4 border-r-2 border-blue-500 space-y-3 pt-2">
+                    <div className="mr-6 pr-4 border-r-2 border-red-500 space-y-3 pt-2">
                       {comment.replies.map((reply) => (
                         <div key={reply.id} className="bg-slate-50 p-3.5 rounded-xl space-y-1.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-xs text-blue-700">{reply.authorName}</span>
+                            <span className="font-bold text-xs text-red-700">{reply.authorName}</span>
                             {reply.authorRole && (
-                              <span className="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded-md font-bold">
+                              <span className="text-[10px] bg-red-100 text-red-800 px-1.5 py-0.2 rounded-md font-bold">
                                 {reply.authorRole}
                               </span>
                             )}

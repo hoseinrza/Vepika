@@ -24,7 +24,7 @@ interface AdminSeoSettingsProps {
   categories: Category[];
   comments: Comment[];
   onSaveSettings: (settings: SiteSettings) => void;
-  onImportData: (data: { articles?: Article[]; categories?: Category[]; comments?: Comment[]; settings?: SiteSettings }) => void;
+  onImportData: (data: { articles?: Article[]; categories?: Category[]; comments?: Comment[]; settings?: SiteSettings }) => Promise<void>;
 }
 
 export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
@@ -47,42 +47,28 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
     setTimeout(() => setSavedSuccess(false), 3000);
   };
 
-  // Export full JSON backup
+  // Export full JSON backup (server streams the current DB content)
   const handleExportData = () => {
-    const backup = {
-      version: '1.0.0',
-      exportedAt: new Date().toISOString(),
-      settings: formData,
-      categories,
-      articles,
-      comments,
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `lalezar-blog-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    window.open('/api/backup/export', '_blank');
   };
 
-  // Import JSON backup
+  // Import JSON backup — server validates and restores it
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target?.result as string);
-        if (parsed.articles || parsed.categories || parsed.settings) {
-          onImportData(parsed);
-          alert('اطلاعات با موفقیت بازیابی شد!');
-        } else {
+        if (!parsed.articles && !parsed.categories && !parsed.settings) {
           alert('فرمت فایل پشتیبان معتبر نیست.');
+          return;
         }
-      } catch (err) {
-        alert('خطا در خواندن فایل JSON.');
+        await onImportData(parsed);
+        alert('اطلاعات با موفقیت بازیابی شد!');
+      } catch (err: any) {
+        alert(err?.message || 'خطا در خواندن یا بازیابی فایل JSON.');
       }
     };
     reader.readAsText(file);

@@ -60,15 +60,15 @@ export const CategoriesIndexView: React.FC<CategoriesIndexViewProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-blue-600 font-bold text-xs">
+          <div className="flex items-center gap-2 text-red-600 font-bold text-xs">
             <Layers className="w-4 h-4" />
-            <span>راهنمای موضوعی وپیکا</span>
+            <span>راهنمای موضوعی ردوبز</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900">
             دسته‌بندی‌های تخصصی آموزش وب و وردپرس
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 max-w-2xl">
-            محتواهای وپیکا در ۱۰ شاخه تخصصی دسته‌بندی شده‌اند تا بتوانید مسیر یادگیری خود را متمرکز و منظم پیش ببرید.
+            محتواهای ردوبز در ۱۰ شاخه تخصصی دسته‌بندی شده‌اند تا بتوانید مسیر یادگیری خود را متمرکز و منظم پیش ببرید.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export const CategoriesIndexView: React.FC<CategoriesIndexViewProps> = ({
             <div
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className="bg-white rounded-3xl border border-slate-200 p-6 space-y-5 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between"
+              className="bg-white rounded-3xl border border-slate-200 p-6 space-y-5 hover:border-red-500 hover:shadow-lg transition-all cursor-pointer group flex flex-col justify-between"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -109,7 +109,7 @@ export const CategoriesIndexView: React.FC<CategoriesIndexViewProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-red-600 transition-colors">
                     {cat.name}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
@@ -118,7 +118,7 @@ export const CategoriesIndexView: React.FC<CategoriesIndexViewProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600">
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-red-600">
                 <span>مشاهده مقالات و آموزش‌ها</span>
                 <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
               </div>

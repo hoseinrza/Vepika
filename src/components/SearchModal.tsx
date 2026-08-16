@@ -68,7 +68,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       >
         {/* Search Input Bar */}
         <div className="p-4 border-b border-slate-200 flex items-center gap-3 bg-slate-50">
-          <Search className="w-5 h-5 text-blue-600 shrink-0" />
+          <Search className="w-5 h-5 text-red-600 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -110,13 +110,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         onSelectArticle(article);
                         onClose();
                       }}
-                      className="p-3.5 bg-slate-50 hover:bg-blue-50/70 border border-slate-200 hover:border-blue-300 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                      className="p-3.5 bg-slate-50 hover:bg-red-50/70 border border-slate-200 hover:border-red-300 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-3 group"
                     >
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2 text-xs">
                           <span
                             className="font-bold px-2 py-0.5 rounded-md"
-                            style={{ backgroundColor: `${cat?.color || '#2563EB'}15`, color: cat?.color || '#2563EB' }}
+                            style={{ backgroundColor: `${cat?.color || '#DC2626'}15`, color: cat?.color || '#DC2626' }}
                           >
                             {cat?.name || 'آموزش'}
                           </span>
@@ -124,14 +124,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                             {formatPersianDate(article.publishDate)}
                           </span>
                         </div>
-                        <h4 className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-blue-700 transition-colors">
+                        <h4 className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-red-700 transition-colors">
                           {article.title}
                         </h4>
                         <p className="text-xs text-slate-500 line-clamp-1">
                           {article.excerpt}
                         </p>
                       </div>
-                      <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-transform group-hover:-translate-x-1 shrink-0" />
+                      <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-red-600 transition-transform group-hover:-translate-x-1 shrink-0" />
                     </div>
                   );
                 })}
@@ -147,7 +147,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
           ) : (
             <div className="space-y-4 py-2">
               <div className="text-xs text-slate-500 font-semibold">
-                پیشنهادهای پربازدید آموزشی وپیکا:
+                پیشنهادهای پربازدید آموزشی ردوبز:
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {articles.slice(0, 4).map((a) => (
