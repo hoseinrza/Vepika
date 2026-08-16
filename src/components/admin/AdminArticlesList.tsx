@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { Article, Category } from '../../types';
 import { analyzeArticleSeo, formatPersianDate, toPersianDigits } from '../../utils/seoAnalyzer';
-import { CoverImage } from '../CoverImage';
 
 interface AdminArticlesListProps {
   articles: Article[];
@@ -173,9 +172,10 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                       {/* Title & Date */}
                       <td className="py-3.5 px-4 max-w-xs sm:max-w-md">
                         <div className="flex items-center gap-3">
-                          <CoverImage
+                          <img
                             src={art.coverImage}
-                            alt={art.title}
+                            alt=""
+                            referrerPolicy="no-referrer"
                             className="w-10 h-10 rounded-lg object-cover shrink-0 hidden sm:block border border-stone-200"
                           />
                           <div>

@@ -2,7 +2,6 @@ import React from 'react';
 import { Clock, Eye, Heart, Bookmark, ArrowLeft, Sparkles, BookOpen, Layers } from 'lucide-react';
 import { Article, Category } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
-import { CoverImage } from './CoverImage';
 
 interface ArticleCardProps {
   article: Article;
@@ -44,16 +43,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
   return (
     <article
       onClick={handleClick}
-      className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-blue-500 hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
+      className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-blue-500/80 hover:shadow-2xl hover:shadow-blue-600/15 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 ease-out flex flex-col cursor-pointer transform-gpu will-change-transform"
       id={`article-card-${article.slug}`}
       dir="rtl"
     >
       {/* Cover Image Container */}
       <div className="relative aspect-16/9 w-full bg-slate-100 overflow-hidden">
-        <CoverImage
+        <img
           src={article.coverImage}
           alt={article.coverImageAlt || article.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          referrerPolicy="no-referrer"
+          className="w-full h-full object-cover group-hover:scale-108 group-hover:brightness-105 transition-all duration-500 ease-out"
+          loading="lazy"
         />
 
         {/* Category Pill Over Image */}
@@ -172,7 +173,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
               <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/20" />
               <span>{toPersianDigits(article.likesCount)}</span>
             </div>
-            <div className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors shadow-2xs">
+            <div className="w-7 h-7 rounded-xl bg-slate-100 group-hover:bg-blue-600 group-hover:text-white group-hover:scale-110 group-hover:-translate-x-0.5 group-hover:shadow-md transition-all duration-300 flex items-center justify-center shadow-2xs">
               <ArrowLeft className="w-3.5 h-3.5" />
             </div>
           </div>

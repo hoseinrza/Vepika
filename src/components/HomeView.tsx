@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Article, Category, SiteSettings } from '../types';
 import { ArticleCard } from './ArticleCard';
-import { CoverImage } from './CoverImage';
 import { toPersianDigits } from '../utils/seoAnalyzer';
 import {
   Sparkles,
@@ -166,9 +165,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
                 {/* Media Column */}
                 <div className="lg:col-span-7 h-64 sm:h-80 lg:h-auto min-h-[340px] relative overflow-hidden bg-slate-900 group">
-                  <CoverImage
+                  <img
                     src={featuredArticle.coverImage}
                     alt={featuredArticle.title}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent lg:hidden" />
@@ -264,7 +264,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between space-y-3"
+              className="bg-white p-4 rounded-2xl border border-slate-200/90 hover:border-blue-500 hover:shadow-xl hover:shadow-blue-600/10 hover:-translate-y-1 hover:scale-[1.03] transition-all duration-300 ease-out cursor-pointer group flex flex-col justify-between space-y-3 transform-gpu will-change-transform"
             >
               <div className="flex items-center justify-between">
                 <div

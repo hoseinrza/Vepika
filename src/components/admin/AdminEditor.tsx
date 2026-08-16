@@ -29,7 +29,6 @@ import {
 import { Article, Category, FAQItem, SchemaType, SiteSettings } from '../../types';
 import { analyzeArticleSeo, toPersianDigits } from '../../utils/seoAnalyzer';
 import { generateArticleSchema } from '../../utils/schemaGenerator';
-import { CoverImage } from '../CoverImage';
 
 interface AdminEditorProps {
   article: Article | null;
@@ -1068,8 +1067,13 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                 )}
 
                 {coverImage && (
-                  <div className="rounded-xl overflow-hidden max-h-72 h-52 bg-stone-100">
-                    <CoverImage src={coverImage} alt={title || 'پیش‌نمایش تصویر'} className="w-full h-full object-cover" />
+                  <div className="rounded-xl overflow-hidden max-h-72 bg-stone-100">
+                    <img
+                      src={coverImage}
+                      alt={title}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
               </div>

@@ -161,39 +161,39 @@ export const DesignSystemView: React.FC<DesignSystemViewProps> = ({ onBack }) =>
       {activeTab === 'typography' && (
         <section className="space-y-8 animate-in fade-in duration-300">
           <div className="space-y-2">
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 flex items-center gap-2.5">
+            <h2 className="font-lalezar text-2xl sm:text-3xl text-slate-900 flex items-center gap-2.5 tracking-wide">
               <span className="w-3 h-3 rounded-full bg-blue-600" />
-              <span>سلسله مراتب تایپوگرافی فارسی (Vazirmatn Scale)</span>
+              <span>ترکیب تایپوگرافی وپیکا (لاله‌زار + وزیرمتن + جت‌برینز مونو)</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-500">
-              تایپ‌فیس وزیرمتن با خوانایی بالا، فواصل استاندارد و نسبت‌های دقیق در تمامی سطوح تیتر و بدنه.
+              ترکیب فونت اصیل و پرانرژی لاله‌زار برای تیترها و عناوین اصلی، فونت وزیرمتن با خوانایی عالی برای متون بدنه و جت‌برینز مونو برای کدهای برنامه‌نویسی.
             </p>
           </div>
 
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6">
             <div className="pb-6 border-b border-slate-100 space-y-2">
-              <span className="text-xs font-mono font-bold text-blue-600">H1 - 32px / 2rem - Font Weight 900 (Black)</span>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900">
+              <span className="text-xs font-mono font-bold text-blue-600">Display / H1 - Lalezar Font (عناوین و برندینگ)</span>
+              <h1 className="font-lalezar text-3xl sm:text-5xl text-slate-900 tracking-wide">
                 مرجع تخصصی آموزش وردپرس، توسعه و معماری وب
               </h1>
             </div>
 
             <div className="pb-6 border-b border-slate-100 space-y-2">
-              <span className="text-xs font-mono font-bold text-blue-600">H2 - 24px / 1.5rem - Font Weight 800 (ExtraBold)</span>
-              <h2 className="text-2xl font-extrabold text-slate-900">
+              <span className="text-xs font-mono font-bold text-blue-600">Display / H2 - Lalezar Font (عناوین بخش‌ها و کارت‌ها)</span>
+              <h2 className="font-lalezar text-2xl sm:text-3xl text-slate-900 tracking-wide">
                 چگونه سرعت لود وردپرس را با لایت‌اسپید کش به زیر یک ثانیه برسانیم؟
               </h2>
             </div>
 
             <div className="pb-6 border-b border-slate-100 space-y-2">
-              <span className="text-xs font-mono font-bold text-blue-600">H3 - 18px / 1.125rem - Font Weight 700 (Bold)</span>
+              <span className="text-xs font-mono font-bold text-blue-600">H3 - Vazirmatn 18px / 1.125rem - Font Weight 700 (Bold)</span>
               <h3 className="text-lg font-bold text-slate-900">
                 تنظیمات بهینه‌سازی دیتابیس و کش اشیاء (Redis Object Cache)
               </h3>
             </div>
 
             <div className="pb-6 border-b border-slate-100 space-y-2">
-              <span className="text-xs font-mono font-bold text-blue-600">Body Text - 16px / 1rem - Line Height 2.0</span>
+              <span className="text-xs font-mono font-bold text-blue-600">Body Text - Vazirmatn 16px / 1rem - Line Height 2.0</span>
               <p className="text-slate-700 text-base leading-loose max-w-4xl text-justify">
                 تایپوگرافی اصولی یکی از اساسی‌ترین فاکتورهای افزایش زمان حضور کاربر در صفحه (Dwell Time) است. در رسانه وپیکا، تمامی پاراگراف‌ها با فاصله خطوط محاسبه‌شده و کنتراست رنگی متناسب با استانداردهای WCAG AA رندر می‌شوند تا چشم خواننده در مقالات طولانی خسته نشود.
               </p>
