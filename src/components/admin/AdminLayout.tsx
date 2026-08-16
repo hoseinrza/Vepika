@@ -34,19 +34,19 @@ interface AdminLayoutProps {
   onNavigateTab: (tab: AdminTab, params?: any) => void;
   onExitAdmin: () => void;
   onLogout: () => void;
-  onSaveArticle: (article: Article) => void;
-  onDeleteArticle: (id: string) => void;
-  onDuplicateArticle: (article: Article) => void;
-  onToggleArticleStatus: (id: string) => void;
-  onSetFeaturedArticle: (id: string) => void;
+  onSaveArticle: (article: Article) => Promise<void>;
+  onDeleteArticle: (id: string) => Promise<void>;
+  onDuplicateArticle: (article: Article) => Promise<void>;
+  onToggleArticleStatus: (id: string) => Promise<void>;
+  onSetFeaturedArticle: (id: string) => Promise<void>;
   onViewLiveArticle: (article: Article) => void;
-  onUpdateCommentStatus: (commentId: string, status: any) => void;
-  onDeleteComment: (commentId: string) => void;
-  onReplyComment: (commentId: string, replyText: string) => void;
-  onSaveCategory: (category: Category) => void;
-  onDeleteCategory: (categoryId: string) => void;
-  onSaveSettings: (settings: SiteSettings) => void;
-  onImportData: (data: any) => void;
+  onUpdateCommentStatus: (commentId: string, status: any) => Promise<void>;
+  onDeleteComment: (commentId: string) => Promise<void>;
+  onReplyComment: (commentId: string, replyText: string) => Promise<void>;
+  onSaveCategory: (category: Category) => Promise<void>;
+  onDeleteCategory: (categoryId: string) => Promise<void>;
+  onSaveSettings: (settings: SiteSettings) => Promise<void>;
+  onImportData: (data: any) => Promise<void>;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -217,8 +217,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             article={editingArticle}
             categories={categories}
             settings={settings}
-            onSave={(saved) => {
-              onSaveArticle(saved);
+            onSave={async (saved: Article) => {
+              await onSaveArticle(saved);
               onNavigateTab('articles');
             }}
             onCancel={() => onNavigateTab('articles')}
@@ -231,8 +231,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             comments={comments}
             articles={articles}
             onUpdateStatus={onUpdateCommentStatus}
-            onDelete={onDeleteComment}
-            onReply={onReplyComment}
+            onDeleteComment={onDeleteComment}
+            onReplyComment={onReplyComment}
+            onViewArticle={onViewLiveArticle}
           />
         )}
 
@@ -240,8 +241,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <AdminCategories
             categories={categories}
             articles={articles}
-            onSave={onSaveCategory}
-            onDelete={onDeleteCategory}
+            onSaveCategory={onSaveCategory}
+            onDeleteCategory={onDeleteCategory}
           />
         )}
 
@@ -251,7 +252,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             categories={categories}
             articles={articles}
             comments={comments}
-            onSave={onSaveSettings}
+            onSaveSettings={onSaveSettings}
             onImportData={onImportData}
           />
         )}
