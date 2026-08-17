@@ -14,6 +14,10 @@ export interface AdminUser {
   id: string;
   username: string;
   role: AdminRole;
+  displayName: string | null;
+  jobTitle: string | null;
+  avatar: string | null;
+  bio: string | null;
   createdAt: string;
 }
 
@@ -44,15 +48,18 @@ export function bootstrapAdmin() {
   console.log(`حساب ادمین با نام کاربری «${username}» ایجاد شد.`);
 }
 
+const PROFILE_COLUMNS = 'id, username, role, displayName, jobTitle, avatar, bio, createdAt';
+
 export function verifyCredentials(username: string, password: string): AdminUser | null {
   const row = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as AdminUserRow | undefined;
   if (!row) return null;
   if (!bcrypt.compareSync(password, row.passwordHash)) return null;
-  return { id: row.id, username: row.username, role: row.role, createdAt: row.createdAt };
+  const { passwordHash, ...user } = row;
+  return user;
 }
 
 export function listUsers(): AdminUser[] {
-  return db.prepare('SELECT id, username, role, createdAt FROM admin_users ORDER BY createdAt ASC').all() as AdminUser[];
+  return db.prepare(`SELECT ${PROFILE_COLUMNS} FROM admin_users ORDER BY createdAt ASC`).all() as AdminUser[];
 }
 
 export function createUser(username: string, password: string, role: AdminRole): AdminUser {
@@ -62,11 +69,30 @@ export function createUser(username: string, password: string, role: AdminRole):
   db.prepare(
     'INSERT INTO admin_users (id, username, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?)'
   ).run(id, username, passwordHash, role, createdAt);
-  return { id, username, role, createdAt };
+  return { id, username, role, displayName: null, jobTitle: null, avatar: null, bio: null, createdAt };
 }
 
 export function deleteUser(id: string) {
   db.prepare('DELETE FROM admin_users WHERE id = ?').run(id);
+}
+
+export function getProfile(id: string): AdminUser | null {
+  const row = db.prepare(`SELECT ${PROFILE_COLUMNS} FROM admin_users WHERE id = ?`).get(id) as AdminUser | undefined;
+  return row ?? null;
+}
+
+export function updateProfile(
+  id: string,
+  profile: { displayName?: string; jobTitle?: string; avatar?: string; bio?: string }
+): AdminUser | null {
+  db.prepare('UPDATE admin_users SET displayName = ?, jobTitle = ?, avatar = ?, bio = ? WHERE id = ?').run(
+    profile.displayName || null,
+    profile.jobTitle || null,
+    profile.avatar || null,
+    profile.bio || null,
+    id
+  );
+  return getProfile(id);
 }
 
 export function countAdmins(): number {
@@ -96,14 +122,25 @@ export function clearSessionCookie(res: Response) {
   res.clearCookie(COOKIE_NAME);
 }
 
+// Resolves the live user record for the session's username rather than trusting
+// the JWT payload's id/role directly — this way sessions signed before the
+// multi-user/role fields existed (or a role changed after login) still work
+// without forcing everyone to log out.
 function readSessionToken(req: Request): { id: string; username: string; role: AdminRole } | null {
   const token = req.cookies?.[COOKIE_NAME];
   if (!token) return null;
+  let username: string | undefined;
   try {
-    return jwt.verify(token, JWT_SECRET) as { id: string; username: string; role: AdminRole };
+    username = (jwt.verify(token, JWT_SECRET) as { username?: string }).username;
   } catch {
     return null;
   }
+  if (!username) return null;
+
+  const row = db.prepare('SELECT id, username, role FROM admin_users WHERE username = ?').get(username) as
+    | { id: string; username: string; role: AdminRole }
+    | undefined;
+  return row ?? null;
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {

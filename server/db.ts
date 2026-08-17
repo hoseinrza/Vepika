@@ -109,6 +109,10 @@ db.exec(`
     username      TEXT NOT NULL UNIQUE,
     passwordHash  TEXT NOT NULL,
     role          TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('admin','author')),
+    displayName   TEXT,
+    jobTitle      TEXT,
+    avatar        TEXT,
+    bio           TEXT,
     createdAt     TEXT NOT NULL
   );
 `);
@@ -148,4 +152,15 @@ if (!adminUsersInfo.some((col) => col.name === 'role')) {
 const articlesInfo = db.prepare('PRAGMA table_info(articles)').all() as { name: string }[];
 if (!articlesInfo.some((col) => col.name === 'ownerUserId')) {
   db.exec('ALTER TABLE articles ADD COLUMN ownerUserId TEXT REFERENCES admin_users(id)');
+}
+
+// Per-user profile fields, added after the initial multi-user rollout.
+const adminUsersInfo2 = db.prepare('PRAGMA table_info(admin_users)').all() as { name: string }[];
+if (!adminUsersInfo2.some((col) => col.name === 'displayName')) {
+  db.exec(`
+    ALTER TABLE admin_users ADD COLUMN displayName TEXT;
+    ALTER TABLE admin_users ADD COLUMN jobTitle TEXT;
+    ALTER TABLE admin_users ADD COLUMN avatar TEXT;
+    ALTER TABLE admin_users ADD COLUMN bio TEXT;
+  `);
 }

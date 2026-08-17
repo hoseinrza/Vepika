@@ -26,9 +26,10 @@ import {
   Link as LinkIcon,
   Image as ImageIcon,
 } from 'lucide-react';
-import { Article, Category, FAQItem, SchemaType, SiteSettings } from '../../types';
+import { Article, Category, FAQItem, SchemaType, SiteSettings, AdminUser } from '../../types';
 import { analyzeArticleSeo, toPersianDigits } from '../../utils/seoAnalyzer';
 import { generateArticleSchema } from '../../utils/schemaGenerator';
+import { api } from '../../utils/api';
 
 interface AdminEditorProps {
   article: Article | null;
@@ -47,6 +48,12 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
 }) => {
   const isNew = !article || article.id === 'new';
   const [isSaving, setIsSaving] = useState(false);
+  const [myProfile, setMyProfile] = useState<AdminUser | null>(null);
+
+  // Own profile, used to attribute newly-written articles to the actual author.
+  useEffect(() => {
+    api.get('/profile').then(setMyProfile).catch(() => {});
+  }, []);
 
   // Editor Tabs: 'content' | 'seo' | 'schema' | 'preview'
   const [activeTab, setActiveTab] = useState<'content' | 'seo' | 'schema' | 'preview'>('content');
@@ -285,11 +292,11 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
       wpPlugin: wpPlugin.trim(),
       wpVersion: wpVersion.trim(),
       author: article?.author || {
-        id: 'author-admin',
-        name: settings.authorName,
-        role: settings.authorRole,
-        avatar: settings.authorAvatar,
-        bio: settings.authorBio,
+        id: myProfile?.id || 'author-admin',
+        name: myProfile?.displayName || myProfile?.username || settings.authorName,
+        role: myProfile?.jobTitle || settings.authorRole,
+        avatar: myProfile?.avatar || settings.authorAvatar,
+        bio: myProfile?.bio || settings.authorBio,
       },
       seo: {
         metaTitle: metaTitle.trim() || `${title} | ${settings.siteTitle}`,

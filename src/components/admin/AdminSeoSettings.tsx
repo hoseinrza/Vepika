@@ -10,7 +10,6 @@ import {
   Upload,
   CheckCircle2,
   Sparkles,
-  User,
   Share2,
   Copy,
   Check,
@@ -226,64 +225,6 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
                 <span>تایید خودکار دیدگاه‌های کاربران (بدون نیاز به تایید دستی)</span>
               </label>
             </div>
-          </div>
-        </div>
-
-        {/* Section 2: Author Profile */}
-        <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-4">
-          <h3 className="font-lalezar text-xl text-stone-900 flex items-center gap-2 border-b border-stone-100 pb-3">
-            <User className="w-5 h-5 text-amber-600" />
-            <span>پروفایل پیش‌فرض نویسنده و تحریریه</span>
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">
-                نام نویسنده / مدیر
-              </label>
-              <input
-                type="text"
-                value={formData.authorName}
-                onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs focus:border-amber-500 focus:outline-hidden"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">
-                عنوان و سمت
-              </label>
-              <input
-                type="text"
-                value={formData.authorRole}
-                onChange={(e) => setFormData({ ...formData, authorRole: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs focus:border-amber-500 focus:outline-hidden"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1">
-                آدرس آواتار تصویر نویسنده
-              </label>
-              <input
-                type="text"
-                value={formData.authorAvatar}
-                onChange={(e) => setFormData({ ...formData, authorAvatar: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs focus:border-amber-500 focus:outline-hidden dir-ltr text-left"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-stone-700 mb-1">
-              بیوگرافی و تخصص نویسنده
-            </label>
-            <textarea
-              rows={2}
-              value={formData.authorBio}
-              onChange={(e) => setFormData({ ...formData, authorBio: e.target.value })}
-              className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs focus:border-amber-500 focus:outline-hidden"
-            ></textarea>
           </div>
         </div>
 

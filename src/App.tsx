@@ -429,6 +429,10 @@ export function App() {
           path={`${ADMIN_SECRET_PATH}/users`}
           element={<AdminLayout currentTab="users" tabParams={null} {...adminLayoutSharedProps} />}
         />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/profile`}
+          element={<AdminLayout currentTab="profile" tabParams={null} {...adminLayoutSharedProps} />}
+        />
         <Route path={`${ADMIN_SECRET_PATH}/*`} element={<Navigate to={ADMIN_SECRET_PATH} replace />} />
       </Routes>
     );

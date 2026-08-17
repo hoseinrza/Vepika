@@ -164,7 +164,8 @@ export type AdminTab =
   | 'comments'
   | 'categories'
   | 'seo-settings'
-  | 'users';
+  | 'users'
+  | 'profile';
 
 export type AdminRole = 'admin' | 'author';
 
@@ -172,6 +173,10 @@ export interface AdminUser {
   id: string;
   username: string;
   role: AdminRole;
+  displayName: string | null;
+  jobTitle: string | null;
+  avatar: string | null;
+  bio: string | null;
   createdAt: string;
 }
 

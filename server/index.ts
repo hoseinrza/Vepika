@@ -7,6 +7,7 @@ import { seedIfEmpty } from './seed';
 import { bootstrapAdmin } from './auth';
 import { authRouter } from './routes/auth.routes';
 import { usersRouter } from './routes/users.routes';
+import { profileRouter } from './routes/profile.routes';
 import { articlesRouter } from './routes/articles.routes';
 import { categoriesRouter } from './routes/categories.routes';
 import { commentsRouter } from './routes/comments.routes';
@@ -31,6 +32,7 @@ async function startServer() {
 
   app.use('/api/auth', authRouter);
   app.use('/api/users', usersRouter);
+  app.use('/api/profile', profileRouter);
   app.use('/api/articles', articlesRouter);
   app.use('/api/categories', categoriesRouter);
   app.use('/api/comments', commentsRouter);
