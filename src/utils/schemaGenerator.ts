@@ -297,7 +297,7 @@ ${categoryUrls}
 export function generateRobotsTxt(siteUrl: string = 'https://redwebs.ir'): string {
   return `User-agent: *
 Allow: /
-Disallow: /admin
+Disallow: /panel-rw2026
 
 Sitemap: ${siteUrl}/sitemap.xml`;
 }

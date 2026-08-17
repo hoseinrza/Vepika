@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Article, Category, Comment, SiteSettings, ViewMode, AdminTab } from './types';
+import React, { useEffect, useState } from 'react';
+import { Link, Navigate, Route, Routes, matchPath, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { AdminTab, Article, Category, Comment, SiteSettings, ViewMode } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HomeView } from './components/HomeView';
@@ -21,7 +22,47 @@ type AuthState = 'checking' | 'authed' | 'anon';
 // URL is the only way in. Keep it out of docs shared publicly.
 const ADMIN_SECRET_PATH = '/panel-rw2026';
 
+// Sets/restores the robots meta tag for pages that must never be indexed
+// (404s, admin, etc). Restores "index, follow" on unmount so navigating
+// away from a noindex route doesn't leak the tag onto the next page.
+function useRobotsMeta(content: string) {
+  useEffect(() => {
+    let el = document.querySelector('meta[name="robots"]');
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute('name', 'robots');
+      document.head.appendChild(el);
+    }
+    el.setAttribute('content', content);
+    return () => {
+      el?.setAttribute('content', 'index, follow');
+    };
+  }, [content]);
+}
+
+function NotFoundView() {
+  useRobotsMeta('noindex, follow');
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-24 sm:py-32 text-center" dir="rtl">
+      <p className="text-red-600 font-black text-sm mb-2">خطای ۴۰۴</p>
+      <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mb-3">صفحه‌ای که دنبالش بودید پیدا نشد</h1>
+      <p className="text-slate-500 text-sm mb-8">
+        ممکن است آدرس اشتباه باشد یا این محتوا جابه‌جا شده باشد.
+      </p>
+      <Link
+        to="/"
+        className="inline-flex items-center justify-center px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold transition-colors"
+      >
+        بازگشت به صفحه اصلی
+      </Link>
+    </div>
+  );
+}
+
 export function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Server-backed content state
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -36,21 +77,14 @@ export function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Navigation & View state
-  const [viewMode, setViewMode] = useState<ViewMode>(() =>
-    typeof window !== 'undefined' && window.location.pathname === ADMIN_SECRET_PATH ? 'admin' : 'home'
-  );
-  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
-
-  // Admin state
-  const [adminTab, setAdminTab] = useState<AdminTab>('dashboard');
-  const [adminTabParams, setAdminTabParams] = useState<any>(null);
+  // Admin auth
   const [authState, setAuthState] = useState<AuthState>('checking');
 
   // Modals & Drawers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+
+  const isAdminRoute = location.pathname === ADMIN_SECRET_PATH || location.pathname.startsWith(`${ADMIN_SECRET_PATH}/`);
 
   // Initial content load from the API
   const loadAllContent = async () => {
@@ -80,19 +114,19 @@ export function App() {
 
   // Check admin session whenever the admin panel is opened
   useEffect(() => {
-    if (viewMode !== 'admin' || authState === 'authed') return;
+    if (!isAdminRoute || authState === 'authed') return;
     setAuthState('checking');
     api
       .get('/auth/me')
       .then(() => setAuthState('authed'))
       .catch(() => setAuthState('anon'));
-  }, [viewMode]);
+  }, [isAdminRoute]);
 
   useEffect(() => {
     localStorage.setItem('redwebs_bookmarks', JSON.stringify(bookmarks));
   }, [bookmarks]);
 
-  // Inject Dynamic SEO & Schema JSON-LD into Document Head
+  // Inject Dynamic SEO & Schema JSON-LD into Document Head, driven by the URL
   useEffect(() => {
     if (!settings) return;
     const existingScript = document.getElementById('dynamic-jsonld-schema');
@@ -104,8 +138,9 @@ export function App() {
     script.id = 'dynamic-jsonld-schema';
     script.type = 'application/ld+json';
 
-    if (viewMode === 'article' && selectedArticleId) {
-      const currentArt = articles.find((a) => a.id === selectedArticleId);
+    const articleMatch = matchPath('/article/:slug', location.pathname);
+    if (articleMatch) {
+      const currentArt = articles.find((a) => a.slug === articleMatch.params.slug);
       if (currentArt) {
         const cat = categories.find((c) => c.id === currentArt.categoryId);
         const schema = generateArticleSchema(currentArt, cat, settings);
@@ -121,21 +156,24 @@ export function App() {
     script.text = JSON.stringify(homeSchema);
     document.head.appendChild(script);
 
-    if (viewMode === 'admin') {
+    if (isAdminRoute) {
       document.title = `پیشخوان مدیریت | ${settings.siteTitle}`;
-    } else if (viewMode === 'toolkit') {
+    } else if (location.pathname === '/toolkit') {
       document.title = `جعبه ابزار و اسنیپت‌های مهندسی وب | ${settings.siteTitle}`;
-    } else if (viewMode === 'design-system') {
+    } else if (location.pathname === '/design-system') {
       document.title = `سیستم دیزاین برند ردوبز | ${settings.siteTitle}`;
-    } else if (viewMode === 'categories-index') {
+    } else if (location.pathname === '/categories') {
       document.title = `دسته‌بندی‌های تخصصی آموزش وب و وردپرس | ${settings.siteTitle}`;
-    } else if (viewMode === 'category' && selectedCategoryId) {
-      const cat = categories.find((c) => c.id === selectedCategoryId);
-      document.title = cat ? `${cat.name} | ${settings.siteTitle}` : settings.siteTitle;
     } else {
-      document.title = `${settings.siteTitle} — ${settings.siteTagline}`;
+      const categoryMatch = matchPath('/category/:slug', location.pathname);
+      if (categoryMatch) {
+        const cat = categories.find((c) => c.slug === categoryMatch.params.slug);
+        document.title = cat ? `${cat.name} | ${settings.siteTitle}` : settings.siteTitle;
+      } else {
+        document.title = `${settings.siteTitle} — ${settings.siteTagline}`;
+      }
     }
-  }, [viewMode, selectedArticleId, selectedCategoryId, articles, categories, settings]);
+  }, [location.pathname, articles, categories, settings, isAdminRoute]);
 
   // Handler: Toggle Bookmark
   const handleToggleBookmark = (id: string, e?: React.MouseEvent) => {
@@ -163,24 +201,45 @@ export function App() {
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, likes } : c)));
   };
 
-  // Handler: Select Article for Reading
-  const handleSelectArticle = (article: Article) => {
+  // Registers a view for an article — fires whenever someone lands on
+  // /article/:slug, whether by clicking a link or opening the URL directly.
+  const handleRegisterView = (id: string) => {
     setArticles((prev) =>
-      prev.map((a) => (a.id === article.id ? { ...a, viewsCount: (a.viewsCount || 0) + 1 } : a))
+      prev.map((a) => (a.id === id ? { ...a, viewsCount: (a.viewsCount || 0) + 1 } : a))
     );
-    api.post(`/articles/${article.id}/view`).catch(() => {});
-    setSelectedArticleId(article.id);
-    setViewMode('article');
+    api.post(`/articles/${id}/view`).catch(() => {});
+  };
+
+  // Handler: Navigate to an article's URL
+  const handleSelectArticle = (article: Article) => {
+    navigate(`/article/${article.slug}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handler: Select Category
+  // Handler: Navigate to a category's URL (or home when cleared)
   const handleSelectCategory = (categoryId: string | null) => {
-    setSelectedCategoryId(categoryId);
-    if (categoryId) {
-      setViewMode('category');
-    } else {
-      setViewMode('home');
+    const category = categoryId ? categories.find((c) => c.id === categoryId) : null;
+    navigate(category ? `/category/${category.slug}` : '/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Handler: generic top-nav navigation (category is handled by onSelectCategory instead)
+  const handleNavigate = (mode: ViewMode) => {
+    switch (mode) {
+      case 'home':
+        navigate('/');
+        break;
+      case 'categories-index':
+        navigate('/categories');
+        break;
+      case 'toolkit':
+        navigate('/toolkit');
+        break;
+      case 'design-system':
+        navigate('/design-system');
+        break;
+      default:
+        break;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -267,31 +326,10 @@ export function App() {
   const handleLogout = async () => {
     await api.post('/auth/logout').catch(() => {});
     setAuthState('anon');
-    setViewMode('home');
+    navigate('/');
   };
 
-  // Selected article for reader view
-  const currentArticle = selectedArticleId
-    ? articles.find((a) => a.id === selectedArticleId) || null
-    : null;
-
-  const currentCategory = currentArticle
-    ? categories.find((c) => c.id === currentArticle.categoryId)
-    : undefined;
-
-  const publishedArticles = articles.filter((a) => a.status === 'published');
-
-  const relatedArticles = currentArticle
-    ? publishedArticles.filter(
-        (a) => a.id !== currentArticle.id && a.categoryId === currentArticle.categoryId
-      )
-    : [];
-
   const bookmarkedArticlesList = articles.filter((a) => bookmarks.includes(a.id));
-
-  const selectedCategoryObj = selectedCategoryId
-    ? categories.find((c) => c.id === selectedCategoryId) || null
-    : null;
 
   if (isLoading || !settings) {
     return (
@@ -314,65 +352,100 @@ export function App() {
   }
 
   // Render Admin View
-  if (viewMode === 'admin') {
+  if (isAdminRoute) {
     if (authState !== 'authed') {
-      return (
-        <AdminLogin
-          onSuccess={() => setAuthState('authed')}
-        />
-      );
+      return <AdminLogin onSuccess={() => setAuthState('authed')} />;
     }
 
+    const handleNavigateTab = (tab: AdminTab, params?: any) => {
+      if (tab === 'dashboard') {
+        navigate(ADMIN_SECRET_PATH);
+      } else if (tab === 'editor') {
+        navigate(`${ADMIN_SECRET_PATH}/editor/${params?.articleId || 'new'}`);
+      } else {
+        navigate(`${ADMIN_SECRET_PATH}/${tab}`);
+      }
+    };
+
+    const adminLayoutSharedProps = {
+      articles,
+      categories,
+      comments,
+      settings,
+      onNavigateTab: handleNavigateTab,
+      onExitAdmin: () => navigate('/'),
+      onLogout: handleLogout,
+      onSaveArticle: handleSaveArticle,
+      onDeleteArticle: handleDeleteArticle,
+      onDuplicateArticle: handleDuplicateArticle,
+      onToggleArticleStatus: handleToggleArticleStatus,
+      onSetFeaturedArticle: handleSetFeaturedArticle,
+      onViewLiveArticle: (art: Article) => navigate(`/article/${art.slug}`),
+      onUpdateCommentStatus: handleUpdateCommentStatus,
+      onDeleteComment: handleDeleteComment,
+      onReplyComment: handleReplyComment,
+      onSaveCategory: handleSaveCategory,
+      onDeleteCategory: handleDeleteCategory,
+      onSaveSettings: handleSaveSettings,
+      onImportData: handleImportData,
+    };
+
     return (
-      <AdminLayout
-        currentTab={adminTab}
-        tabParams={adminTabParams}
-        articles={articles}
-        categories={categories}
-        comments={comments}
-        settings={settings}
-        onNavigateTab={(tab, params) => {
-          setAdminTab(tab);
-          setAdminTabParams(params || null);
-        }}
-        onExitAdmin={() => setViewMode('home')}
-        onLogout={handleLogout}
-        onSaveArticle={handleSaveArticle}
-        onDeleteArticle={handleDeleteArticle}
-        onDuplicateArticle={handleDuplicateArticle}
-        onToggleArticleStatus={handleToggleArticleStatus}
-        onSetFeaturedArticle={handleSetFeaturedArticle}
-        onViewLiveArticle={(art) => {
-          setSelectedArticleId(art.id);
-          setViewMode('article');
-        }}
-        onUpdateCommentStatus={handleUpdateCommentStatus}
-        onDeleteComment={handleDeleteComment}
-        onReplyComment={handleReplyComment}
-        onSaveCategory={handleSaveCategory}
-        onDeleteCategory={handleDeleteCategory}
-        onSaveSettings={handleSaveSettings}
-        onImportData={handleImportData}
-      />
+      <Routes>
+        <Route
+          path={ADMIN_SECRET_PATH}
+          element={<AdminLayout currentTab="dashboard" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/articles`}
+          element={<AdminLayout currentTab="articles" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/editor/:id`}
+          element={<AdminEditorRoute {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/comments`}
+          element={<AdminLayout currentTab="comments" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/categories`}
+          element={<AdminLayout currentTab="categories" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/seo-settings`}
+          element={<AdminLayout currentTab="seo-settings" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route path={`${ADMIN_SECRET_PATH}/*`} element={<Navigate to={ADMIN_SECRET_PATH} replace />} />
+      </Routes>
     );
   }
 
   // Render Public Website views
+  const currentViewMode: ViewMode = location.pathname === '/toolkit'
+    ? 'toolkit'
+    : location.pathname === '/design-system'
+    ? 'design-system'
+    : location.pathname === '/categories'
+    ? 'categories-index'
+    : matchPath('/category/:slug', location.pathname)
+    ? 'category'
+    : matchPath('/article/:slug', location.pathname)
+    ? 'article'
+    : 'home';
+
+  const selectedCategoryId = (() => {
+    const categoryMatch = matchPath('/category/:slug', location.pathname);
+    if (!categoryMatch) return null;
+    return categories.find((c) => c.slug === categoryMatch.params.slug)?.id || null;
+  })();
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-red-600 selection:text-white">
       {/* Global Header */}
       <Header
-        viewMode={viewMode}
-        onNavigate={(mode, data) => {
-          if (mode === 'admin') {
-            setAdminTab(data?.tab || 'dashboard');
-            setAdminTabParams(data?.articleId ? { articleId: data.articleId } : null);
-            setViewMode('admin');
-          } else {
-            setViewMode(mode);
-          }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        viewMode={currentViewMode}
+        onNavigate={handleNavigate}
         categories={categories}
         selectedCategoryId={selectedCategoryId}
         onSelectCategory={handleSelectCategory}
@@ -383,66 +456,75 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {viewMode === 'toolkit' && (
-          <WordPressToolkit onBack={() => setViewMode('home')} />
-        )}
-
-        {viewMode === 'design-system' && (
-          <DesignSystemView onBack={() => setViewMode('home')} />
-        )}
-
-        {viewMode === 'categories-index' && (
-          <CategoriesIndexView
-            categories={categories}
-            articles={articles}
-            onSelectCategory={handleSelectCategory}
-            onBack={() => setViewMode('home')}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <HomeView
+                articles={articles}
+                categories={categories}
+                bookmarks={bookmarks}
+                onSelectArticle={handleSelectArticle}
+                onSelectCategory={handleSelectCategory}
+                onToggleBookmark={handleToggleBookmark}
+                onOpenToolkit={() => navigate('/toolkit')}
+                onOpenCategoriesIndex={() => navigate('/categories')}
+              />
+            }
           />
-        )}
 
-        {viewMode === 'category' && selectedCategoryObj && (
-          <CategoryView
-            category={selectedCategoryObj}
-            articles={articles}
-            categories={categories}
-            bookmarks={bookmarks}
-            onSelectArticle={handleSelectArticle}
-            onSelectCategory={handleSelectCategory}
-            onToggleBookmark={handleToggleBookmark}
-            onBack={() => setViewMode('home')}
+          <Route
+            path="/categories"
+            element={
+              <CategoriesIndexView
+                categories={categories}
+                articles={articles}
+                onSelectCategory={handleSelectCategory}
+                onBack={() => navigate('/')}
+              />
+            }
           />
-        )}
 
-        {viewMode === 'article' && currentArticle && (
-          <ArticleView
-            article={currentArticle}
-            category={currentCategory}
-            relatedArticles={relatedArticles}
-            comments={comments}
-            isBookmarked={bookmarks.includes(currentArticle.id)}
-            settings={settings}
-            onBack={() => setViewMode('home')}
-            onSelectArticle={handleSelectArticle}
-            onSelectCategory={handleSelectCategory}
-            onToggleBookmark={handleToggleBookmark}
-            onLikeArticle={handleLikeArticle}
-            onAddComment={handleAddComment}
-            onLikeComment={handleLikeComment}
+          <Route
+            path="/category/:slug"
+            element={
+              <CategoryRoute
+                articles={articles}
+                categories={categories}
+                bookmarks={bookmarks}
+                onSelectArticle={handleSelectArticle}
+                onSelectCategory={handleSelectCategory}
+                onToggleBookmark={handleToggleBookmark}
+              />
+            }
           />
-        )}
 
-        {(viewMode === 'home' || (viewMode as any) === 'blog') && (
-          <HomeView
-            articles={articles}
-            categories={categories}
-            bookmarks={bookmarks}
-            onSelectArticle={handleSelectArticle}
-            onSelectCategory={handleSelectCategory}
-            onToggleBookmark={handleToggleBookmark}
-            onOpenToolkit={() => setViewMode('toolkit')}
-            onOpenCategoriesIndex={() => setViewMode('categories-index')}
+          <Route
+            path="/article/:slug"
+            element={
+              <ArticleRoute
+                articles={articles}
+                categories={categories}
+                comments={comments}
+                bookmarks={bookmarks}
+                settings={settings}
+                onRegisterView={handleRegisterView}
+                onSelectArticle={handleSelectArticle}
+                onSelectCategory={handleSelectCategory}
+                onToggleBookmark={handleToggleBookmark}
+                onLikeArticle={handleLikeArticle}
+                onAddComment={handleAddComment}
+                onLikeComment={handleLikeComment}
+              />
+            }
           />
-        )}
+
+          <Route path="/toolkit" element={<WordPressToolkit onBack={() => navigate('/')} />} />
+
+          <Route path="/design-system" element={<DesignSystemView onBack={() => navigate('/')} />} />
+
+          <Route path="*" element={<NotFoundView />} />
+        </Routes>
       </main>
 
       {/* Global Footer */}
@@ -451,11 +533,11 @@ export function App() {
         settings={settings}
         onSelectCategory={handleSelectCategory}
         onOpenToolkit={() => {
-          setViewMode('toolkit');
+          navigate('/toolkit');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenDesignSystem={() => {
-          setViewMode('design-system');
+          navigate('/design-system');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
@@ -479,6 +561,115 @@ export function App() {
       />
     </div>
   );
+}
+
+// --- Route-param resolvers -------------------------------------------------
+// Small wrapper components that read the slug out of the URL, resolve it
+// against already-loaded data, and hand off to the existing view components.
+// Keeping these thin means CategoryView/ArticleView never need to know
+// routing exists at all.
+
+function CategoryRoute({
+  articles,
+  categories,
+  bookmarks,
+  onSelectArticle,
+  onSelectCategory,
+  onToggleBookmark,
+}: {
+  articles: Article[];
+  categories: Category[];
+  bookmarks: string[];
+  onSelectArticle: (article: Article) => void;
+  onSelectCategory: (id: string | null) => void;
+  onToggleBookmark: (id: string, e?: React.MouseEvent) => void;
+}) {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const category = categories.find((c) => c.slug === slug);
+
+  if (!category) return <NotFoundView />;
+
+  return (
+    <CategoryView
+      category={category}
+      articles={articles}
+      categories={categories}
+      bookmarks={bookmarks}
+      onSelectArticle={onSelectArticle}
+      onSelectCategory={onSelectCategory}
+      onToggleBookmark={onToggleBookmark}
+      onBack={() => navigate('/')}
+    />
+  );
+}
+
+function ArticleRoute({
+  articles,
+  categories,
+  comments,
+  bookmarks,
+  settings,
+  onRegisterView,
+  onSelectArticle,
+  onSelectCategory,
+  onToggleBookmark,
+  onLikeArticle,
+  onAddComment,
+  onLikeComment,
+}: {
+  articles: Article[];
+  categories: Category[];
+  comments: Comment[];
+  bookmarks: string[];
+  settings: SiteSettings;
+  onRegisterView: (id: string) => void;
+  onSelectArticle: (article: Article) => void;
+  onSelectCategory: (id: string | null) => void;
+  onToggleBookmark: (id: string, e?: React.MouseEvent) => void;
+  onLikeArticle: (id: string) => Promise<void>;
+  onAddComment: (data: Omit<Comment, 'id' | 'createdAt' | 'likes'>) => Promise<void>;
+  onLikeComment: (id: string) => Promise<void>;
+}) {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+  const article = articles.find((a) => a.slug === slug);
+
+  useEffect(() => {
+    if (article) onRegisterView(article.id);
+    // Only re-register when the article being viewed actually changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [article?.id]);
+
+  if (!article) return <NotFoundView />;
+
+  const category = categories.find((c) => c.id === article.categoryId);
+  const relatedArticles = articles.filter(
+    (a) => a.status === 'published' && a.id !== article.id && a.categoryId === article.categoryId
+  );
+
+  return (
+    <ArticleView
+      article={article}
+      category={category}
+      relatedArticles={relatedArticles}
+      comments={comments}
+      isBookmarked={bookmarks.includes(article.id)}
+      settings={settings}
+      onBack={() => navigate('/')}
+      onSelectArticle={onSelectArticle}
+      onSelectCategory={onSelectCategory}
+      onToggleBookmark={onToggleBookmark}
+      onLikeArticle={onLikeArticle}
+      onAddComment={onAddComment}
+      onLikeComment={onLikeComment}
+    />
+  );
+}
+
+function AdminEditorRoute(props: any) {
+  const { id } = useParams();
+  return <AdminLayout currentTab="editor" tabParams={{ articleId: id }} {...props} />;
 }
 
 export default App;
