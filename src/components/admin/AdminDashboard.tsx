@@ -65,10 +65,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           <button
             onClick={() => onNavigateTab('editor', { articleId: 'new' })}
-            className="flex-1 md:flex-none px-4 py-3 bg-amber-500 hover:bg-amber-400 text-stone-950 rounded-xl font-lalezar text-base flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
+            className="w-full sm:w-auto px-4 py-3 bg-amber-500 hover:bg-amber-400 text-stone-950 rounded-xl font-lalezar text-base flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
             id="admin-dash-new-post-btn"
           >
             <PlusCircle className="w-5 h-5" />
@@ -76,7 +76,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
           <button
             onClick={() => onNavigateTab('comments')}
-            className="flex-1 md:flex-none px-4 py-3 bg-stone-800 hover:bg-stone-700 text-amber-400 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-3 bg-stone-800 hover:bg-stone-700 text-amber-400 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <MessageSquare className="w-4 h-4" />
             <span>بررسی دیدگاه‌ها</span>
@@ -90,7 +90,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Articles */}
         <div className="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs space-y-2">
           <div className="flex items-center justify-between text-stone-500 text-xs font-semibold">

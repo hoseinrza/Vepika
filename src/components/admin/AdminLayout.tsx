@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutDashboard,
   FileText,
@@ -15,6 +15,8 @@ import {
   LogOut,
   Users,
   UserCircle,
+  Menu,
+  X,
 } from 'lucide-react';
 import { AdminTab, Article, Category, Comment, SiteSettings } from '../../types';
 import { toPersianDigits } from '../../utils/seoAnalyzer';
@@ -88,6 +90,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const isAdmin = currentUser.role === 'admin';
 
+  // Below md, the sidebar collapses into a top bar + slide-down menu instead
+  // of a tall stack that pushes page content below the fold.
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
   // Personal items: available to every logged-in user (admin or author).
   const personalNavItems = [
     {
@@ -157,7 +163,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     return (
       <button
         key={item.id}
-        onClick={() => onNavigateTab(item.id, item.params)}
+        onClick={() => {
+          onNavigateTab(item.id, item.params);
+          setIsMobileNavOpen(false);
+        }}
         className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
           isActive
             ? 'bg-red-600 text-white shadow-xs'
@@ -181,10 +190,66 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     );
   };
 
+  const navBody = (
+    <>
+      {/* Navigation Items */}
+      <nav className="p-3 space-y-1.5">
+        {personalNavItems.map(renderNavButton)}
+
+        {isAdmin && (
+          <>
+            <div className="pt-3 mt-2 border-t border-slate-800 px-1">
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                مدیریت سایت
+              </span>
+            </div>
+            {siteManagementNavItems.map(renderNavButton)}
+          </>
+        )}
+      </nav>
+
+      {/* Back to Website / Logout */}
+      <div className="p-4 border-t border-slate-800 space-y-2">
+        <button
+          onClick={onExitAdmin}
+          className="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-700"
+          id="admin-exit-to-site-btn"
+        >
+          <ArrowRight className="w-4 h-4" />
+          <span>مشاهده و بازگشت به وبسایت</span>
+        </button>
+        <button
+          onClick={onLogout}
+          className="w-full py-2.5 px-3 bg-transparent hover:bg-rose-500/10 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-rose-500/20"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>خروج از حساب کاربری</span>
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row text-right font-sans" dir="rtl">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-[#0F172A] text-slate-200 border-l border-slate-800 flex flex-col shrink-0">
+      {/* Mobile top bar (below md) */}
+      <div className="md:hidden bg-[#0F172A] text-slate-200 border-b border-slate-800 sticky top-0 z-30">
+        <div className="p-4 flex items-center justify-between">
+          <RedwebsLogo theme="dark" size="sm" />
+          <button
+            onClick={() => setIsMobileNavOpen((open) => !open)}
+            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer"
+            aria-label="منوی پیشخوان"
+          >
+            {isMobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+        {isMobileNavOpen && (
+          <div className="border-t border-slate-800 max-h-[calc(100vh-72px)] overflow-y-auto">{navBody}</div>
+        )}
+      </div>
+
+      {/* Sidebar (md and up) */}
+      <aside className="hidden md:flex md:w-64 bg-[#0F172A] text-slate-200 border-l border-slate-800 flex-col shrink-0">
         {/* Sidebar Header */}
         <div className="p-5 border-b border-slate-800 flex items-center justify-between">
           <div className="space-y-1">
@@ -195,40 +260,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </div>
         </div>
 
-        {/* Navigation Items */}
-        <nav className="p-3 space-y-1.5 flex-1 overflow-y-auto">
-          {personalNavItems.map(renderNavButton)}
-
-          {isAdmin && (
-            <>
-              <div className="pt-3 mt-2 border-t border-slate-800 px-1">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                  مدیریت سایت
-                </span>
-              </div>
-              {siteManagementNavItems.map(renderNavButton)}
-            </>
-          )}
-        </nav>
-
-        {/* Sidebar Bottom: Back to Website */}
-        <div className="p-4 border-t border-slate-800 space-y-2">
-          <button
-            onClick={onExitAdmin}
-            className="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-red-300 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-slate-700"
-            id="admin-exit-to-site-btn"
-          >
-            <ArrowRight className="w-4 h-4" />
-            <span>مشاهده و بازگشت به وبسایت</span>
-          </button>
-          <button
-            onClick={onLogout}
-            className="w-full py-2.5 px-3 bg-transparent hover:bg-rose-500/10 text-rose-400 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-rose-500/20"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>خروج از حساب کاربری</span>
-          </button>
-        </div>
+        <div className="flex-1 overflow-y-auto flex flex-col justify-between">{navBody}</div>
       </aside>
 
       {/* Main Content Area */}
