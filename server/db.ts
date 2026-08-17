@@ -1,4 +1,5 @@
 import Database from 'better-sqlite3';
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -104,9 +105,47 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS admin_users (
-    id            INTEGER PRIMARY KEY CHECK (id = 1),
+    id            TEXT PRIMARY KEY,
     username      TEXT NOT NULL UNIQUE,
     passwordHash  TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('admin','author')),
     createdAt     TEXT NOT NULL
   );
 `);
+
+// --- Migrations for installs created before multi-user support existed ---
+
+// admin_users used to be capped at a single row (id INTEGER CHECK (id = 1)).
+// Detect the old shape and rebuild the table with a real primary key + role.
+const adminUsersInfo = db.prepare('PRAGMA table_info(admin_users)').all() as { name: string }[];
+if (!adminUsersInfo.some((col) => col.name === 'role')) {
+  const legacyRows = db.prepare('SELECT username, passwordHash, createdAt FROM admin_users').all() as {
+    username: string;
+    passwordHash: string;
+    createdAt: string;
+  }[];
+
+  db.exec('ALTER TABLE admin_users RENAME TO admin_users_legacy');
+  db.exec(`
+    CREATE TABLE admin_users (
+      id            TEXT PRIMARY KEY,
+      username      TEXT NOT NULL UNIQUE,
+      passwordHash  TEXT NOT NULL,
+      role          TEXT NOT NULL DEFAULT 'admin' CHECK (role IN ('admin','author')),
+      createdAt     TEXT NOT NULL
+    );
+  `);
+
+  const insertLegacyUser = db.prepare(
+    'INSERT INTO admin_users (id, username, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?)'
+  );
+  for (const row of legacyRows) {
+    insertLegacyUser.run(crypto.randomUUID(), row.username, row.passwordHash, 'admin', row.createdAt);
+  }
+  db.exec('DROP TABLE admin_users_legacy');
+}
+
+const articlesInfo = db.prepare('PRAGMA table_info(articles)').all() as { name: string }[];
+if (!articlesInfo.some((col) => col.name === 'ownerUserId')) {
+  db.exec('ALTER TABLE articles ADD COLUMN ownerUserId TEXT REFERENCES admin_users(id)');
+}

@@ -78,6 +78,7 @@ export function App() {
 
   // Admin auth
   const [authState, setAuthState] = useState<AuthState>('checking');
+  const [currentUser, setCurrentUser] = useState<{ username: string; role: 'admin' | 'author' } | null>(null);
 
   // Modals & Drawers
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -117,7 +118,10 @@ export function App() {
     setAuthState('checking');
     api
       .get('/auth/me')
-      .then(() => setAuthState('authed'))
+      .then((me) => {
+        setCurrentUser({ username: me.username, role: me.role });
+        setAuthState('authed');
+      })
       .catch(() => setAuthState('anon'));
   }, [isAdminRoute]);
 
@@ -319,6 +323,7 @@ export function App() {
 
   const handleLogout = async () => {
     await api.post('/auth/logout').catch(() => {});
+    setCurrentUser(null);
     setAuthState('anon');
     navigate('/');
   };
@@ -348,7 +353,16 @@ export function App() {
   // Render Admin View
   if (isAdminRoute) {
     if (authState !== 'authed') {
-      return <AdminLogin onSuccess={() => setAuthState('authed')} />;
+      return (
+        <AdminLogin
+          onSuccess={() => {
+            api.get('/auth/me').then((me) => {
+              setCurrentUser({ username: me.username, role: me.role });
+              setAuthState('authed');
+            });
+          }}
+        />
+      );
     }
 
     const handleNavigateTab = (tab: AdminTab, params?: any) => {
@@ -366,6 +380,7 @@ export function App() {
       categories,
       comments,
       settings,
+      currentUser: currentUser!,
       onNavigateTab: handleNavigateTab,
       onExitAdmin: () => navigate('/'),
       onLogout: handleLogout,
@@ -409,6 +424,10 @@ export function App() {
         <Route
           path={`${ADMIN_SECRET_PATH}/seo-settings`}
           element={<AdminLayout currentTab="seo-settings" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/users`}
+          element={<AdminLayout currentTab="users" tabParams={null} {...adminLayoutSharedProps} />}
         />
         <Route path={`${ADMIN_SECRET_PATH}/*`} element={<Navigate to={ADMIN_SECRET_PATH} replace />} />
       </Routes>

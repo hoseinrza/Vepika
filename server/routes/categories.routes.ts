@@ -2,7 +2,7 @@ import { Router } from 'express';
 import crypto from 'crypto';
 import { db } from '../db';
 import { categoryFromRow } from '../mappers';
-import { requireAuth } from '../auth';
+import { requireAdmin } from '../auth';
 import { slugify, ensureUniqueSlug } from '../slugify';
 import { Category } from '../../src/types';
 
@@ -21,7 +21,7 @@ categoriesRouter.get('/', (_req, res) => {
   res.json(listCategories());
 });
 
-categoriesRouter.post('/', requireAuth, (req, res) => {
+categoriesRouter.post('/', requireAdmin, (req, res) => {
   const body = req.body as Category;
   if (!body?.name) return res.status(400).json({ error: 'نام دسته‌بندی الزامی است' });
 
@@ -54,7 +54,7 @@ categoriesRouter.post('/', requireAuth, (req, res) => {
   res.status(201).json({ ...category, postCount: 0 });
 });
 
-categoriesRouter.put('/:id', requireAuth, (req, res) => {
+categoriesRouter.put('/:id', requireAdmin, (req, res) => {
   const existing = db.prepare('SELECT * FROM categories WHERE id = ?').get(req.params.id) as any;
   if (!existing) return res.status(404).json({ error: 'دسته‌بندی یافت نشد' });
 
@@ -85,7 +85,7 @@ categoriesRouter.put('/:id', requireAuth, (req, res) => {
   res.json(categoryFromRow(db.prepare('SELECT * FROM categories WHERE id = ?').get(existing.id), count));
 });
 
-categoriesRouter.delete('/:id', requireAuth, (req, res) => {
+categoriesRouter.delete('/:id', requireAdmin, (req, res) => {
   const { count: totalCategories } = db.prepare('SELECT COUNT(*) as count FROM categories').get() as {
     count: number;
   };

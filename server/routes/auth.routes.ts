@@ -6,7 +6,7 @@ import {
   setSessionCookie,
   clearSessionCookie,
   requireAuth,
-  getSessionUsername,
+  getSessionUser,
 } from '../auth';
 
 export const authRouter = Router();
@@ -16,12 +16,13 @@ authRouter.post('/login', (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ error: 'نام کاربری و رمز عبور الزامی است' });
   }
-  if (!verifyCredentials(username, password)) {
+  const user = verifyCredentials(username, password);
+  if (!user) {
     return res.status(401).json({ error: 'نام کاربری یا رمز عبور اشتباه است' });
   }
-  const token = signSessionToken(username);
+  const token = signSessionToken(user);
   setSessionCookie(res, token);
-  res.json({ username });
+  res.json({ username: user.username, role: user.role });
 });
 
 authRouter.post('/logout', (_req, res) => {
@@ -30,11 +31,11 @@ authRouter.post('/logout', (_req, res) => {
 });
 
 authRouter.get('/me', (req, res) => {
-  const username = getSessionUsername(req);
-  if (!username) {
+  const user = getSessionUser(req);
+  if (!user) {
     return res.status(401).json({ authenticated: false });
   }
-  res.json({ authenticated: true, username });
+  res.json({ authenticated: true, username: user.username, role: user.role });
 });
 
 authRouter.patch('/password', requireAuth, (req, res) => {

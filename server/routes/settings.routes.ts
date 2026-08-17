@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db';
 import { settingsFromRow } from '../mappers';
-import { requireAuth } from '../auth';
+import { requireAdmin } from '../auth';
 import { SiteSettings } from '../../src/types';
 
 export const settingsRouter = Router();
@@ -12,7 +12,7 @@ settingsRouter.get('/', (_req, res) => {
   res.json(settingsFromRow(row));
 });
 
-settingsRouter.put('/', requireAuth, (req, res) => {
+settingsRouter.put('/', requireAdmin, (req, res) => {
   const s = req.body as SiteSettings;
   db.prepare(`
     UPDATE settings SET

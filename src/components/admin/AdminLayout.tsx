@@ -13,6 +13,7 @@ import {
   Code,
   Sliders,
   LogOut,
+  Users,
 } from 'lucide-react';
 import { AdminTab, Article, Category, Comment, SiteSettings } from '../../types';
 import { toPersianDigits } from '../../utils/seoAnalyzer';
@@ -22,6 +23,7 @@ import { AdminEditor } from './AdminEditor';
 import { AdminCommentsList } from './AdminCommentsList';
 import { AdminCategories } from './AdminCategories';
 import { AdminSeoSettings } from './AdminSeoSettings';
+import { AdminUsers } from './AdminUsers';
 import { RedwebsLogo } from '../RedwebsLogo';
 
 interface AdminLayoutProps {
@@ -31,6 +33,7 @@ interface AdminLayoutProps {
   categories: Category[];
   comments: Comment[];
   settings: SiteSettings;
+  currentUser: { username: string; role: 'admin' | 'author' };
   onNavigateTab: (tab: AdminTab, params?: any) => void;
   onExitAdmin: () => void;
   onLogout: () => void;
@@ -56,6 +59,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   categories,
   comments,
   settings,
+  currentUser,
   onNavigateTab,
   onExitAdmin,
   onLogout,
@@ -80,6 +84,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     ? articles.find((a) => a.id === tabParams.articleId) || null
     : null;
 
+  const isAdmin = currentUser.role === 'admin';
+
   const navItems = [
     {
       id: 'dashboard' as AdminTab,
@@ -98,24 +104,33 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       icon: PlusCircle,
       params: { articleId: 'new' },
     },
-    {
-      id: 'comments' as AdminTab,
-      label: 'دیدگاه‌ها و نظرات',
-      icon: MessageSquare,
-      badge: pendingCommentsCount > 0 ? toPersianDigits(pendingCommentsCount) : undefined,
-      badgeColor: 'bg-rose-500 text-white',
-    },
-    {
-      id: 'categories' as AdminTab,
-      label: 'دسته‌بندی موضوعی',
-      icon: FolderTree,
-      badge: toPersianDigits(categories.length),
-    },
-    {
-      id: 'seo-settings' as AdminTab,
-      label: 'تنظیمات سئو و سایت',
-      icon: Settings,
-    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'comments' as AdminTab,
+            label: 'دیدگاه‌ها و نظرات',
+            icon: MessageSquare,
+            badge: pendingCommentsCount > 0 ? toPersianDigits(pendingCommentsCount) : undefined,
+            badgeColor: 'bg-rose-500 text-white',
+          },
+          {
+            id: 'categories' as AdminTab,
+            label: 'دسته‌بندی موضوعی',
+            icon: FolderTree,
+            badge: toPersianDigits(categories.length),
+          },
+          {
+            id: 'seo-settings' as AdminTab,
+            label: 'تنظیمات سئو و سایت',
+            icon: Settings,
+          },
+          {
+            id: 'users' as AdminTab,
+            label: 'کاربران پیشخوان',
+            icon: Users,
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -188,6 +203,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl">
+        {!isAdmin && (['comments', 'categories', 'seo-settings', 'users'] as AdminTab[]).includes(currentTab) ? (
+          <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center space-y-2">
+            <h2 className="font-lalezar text-xl text-stone-900">این بخش فقط برای مدیر کل قابل دسترسی است</h2>
+            <p className="text-xs text-stone-500">حساب کاربری شما به‌عنوان نویسنده، فقط دسترسی به مقالات خودتان دارد.</p>
+          </div>
+        ) : (
+          <>
         {currentTab === 'dashboard' && (
           <AdminDashboard
             articles={articles}
@@ -202,6 +224,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <AdminArticlesList
             articles={articles}
             categories={categories}
+            canFeature={isAdmin}
             onNewArticle={() => onNavigateTab('editor', { articleId: 'new' })}
             onEditArticle={(art) => onNavigateTab('editor', { articleId: art.id })}
             onDeleteArticle={onDeleteArticle}
@@ -255,6 +278,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             onSaveSettings={onSaveSettings}
             onImportData={onImportData}
           />
+        )}
+
+        {currentTab === 'users' && <AdminUsers currentUsername={currentUser.username} />}
+          </>
         )}
       </main>
     </div>

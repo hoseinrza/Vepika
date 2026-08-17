@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db';
@@ -7,10 +8,23 @@ const JWT_SECRET = process.env.JWT_SECRET || 'redwebs-dev-secret-change-me';
 const COOKIE_NAME = 'redwebs_session';
 const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
+export type AdminRole = 'admin' | 'author';
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  role: AdminRole;
+  createdAt: string;
+}
+
+interface AdminUserRow extends AdminUser {
+  passwordHash: string;
+}
+
 declare global {
   namespace Express {
     interface Request {
-      admin?: { username: string };
+      admin?: { id: string; username: string; role: AdminRole };
     }
   }
 }
@@ -24,18 +38,40 @@ export function bootstrapAdmin() {
   const passwordHash = bcrypt.hashSync(password, 10);
 
   db.prepare(
-    'INSERT INTO admin_users (id, username, passwordHash, createdAt) VALUES (1, ?, ?, ?)'
-  ).run(username, passwordHash, new Date().toISOString());
+    'INSERT INTO admin_users (id, username, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?)'
+  ).run(crypto.randomUUID(), username, passwordHash, 'admin', new Date().toISOString());
 
   console.log(`حساب ادمین با نام کاربری «${username}» ایجاد شد.`);
 }
 
-export function verifyCredentials(username: string, password: string): boolean {
-  const row = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as
-    | { username: string; passwordHash: string }
-    | undefined;
-  if (!row) return false;
-  return bcrypt.compareSync(password, row.passwordHash);
+export function verifyCredentials(username: string, password: string): AdminUser | null {
+  const row = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(username) as AdminUserRow | undefined;
+  if (!row) return null;
+  if (!bcrypt.compareSync(password, row.passwordHash)) return null;
+  return { id: row.id, username: row.username, role: row.role, createdAt: row.createdAt };
+}
+
+export function listUsers(): AdminUser[] {
+  return db.prepare('SELECT id, username, role, createdAt FROM admin_users ORDER BY createdAt ASC').all() as AdminUser[];
+}
+
+export function createUser(username: string, password: string, role: AdminRole): AdminUser {
+  const id = crypto.randomUUID();
+  const passwordHash = bcrypt.hashSync(password, 10);
+  const createdAt = new Date().toISOString();
+  db.prepare(
+    'INSERT INTO admin_users (id, username, passwordHash, role, createdAt) VALUES (?, ?, ?, ?, ?)'
+  ).run(id, username, passwordHash, role, createdAt);
+  return { id, username, role, createdAt };
+}
+
+export function deleteUser(id: string) {
+  db.prepare('DELETE FROM admin_users WHERE id = ?').run(id);
+}
+
+export function countAdmins(): number {
+  const row = db.prepare("SELECT COUNT(*) as count FROM admin_users WHERE role = 'admin'").get() as { count: number };
+  return row.count;
 }
 
 export function updatePassword(username: string, newPassword: string) {
@@ -43,8 +79,8 @@ export function updatePassword(username: string, newPassword: string) {
   db.prepare('UPDATE admin_users SET passwordHash = ? WHERE username = ?').run(passwordHash, username);
 }
 
-export function signSessionToken(username: string): string {
-  return jwt.sign({ username }, JWT_SECRET, { expiresIn: '7d' });
+export function signSessionToken(user: AdminUser): string {
+  return jwt.sign({ id: user.id, username: user.username, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 }
 
 export function setSessionCookie(res: Response, token: string) {
@@ -60,27 +96,38 @@ export function clearSessionCookie(res: Response) {
   res.clearCookie(COOKIE_NAME);
 }
 
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const token = req.cookies?.[COOKIE_NAME];
-  if (!token) {
-    return res.status(401).json({ error: 'احراز هویت لازم است' });
-  }
-  try {
-    const payload = jwt.verify(token, JWT_SECRET) as { username: string };
-    req.admin = { username: payload.username };
-    next();
-  } catch {
-    return res.status(401).json({ error: 'نشست شما منقضی شده است، دوباره وارد شوید' });
-  }
-}
-
-export function getSessionUsername(req: Request): string | null {
+function readSessionToken(req: Request): { id: string; username: string; role: AdminRole } | null {
   const token = req.cookies?.[COOKIE_NAME];
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, JWT_SECRET) as { username: string };
-    return payload.username;
+    return jwt.verify(token, JWT_SECRET) as { id: string; username: string; role: AdminRole };
   } catch {
     return null;
   }
+}
+
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const payload = readSessionToken(req);
+  if (!payload) {
+    return res.status(401).json({ error: 'احراز هویت لازم است' });
+  }
+  req.admin = payload;
+  next();
+}
+
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  requireAuth(req, res, () => {
+    if (req.admin?.role !== 'admin') {
+      return res.status(403).json({ error: 'این بخش فقط برای مدیر کل قابل دسترسی است' });
+    }
+    next();
+  });
+}
+
+export function getSessionUsername(req: Request): string | null {
+  return readSessionToken(req)?.username ?? null;
+}
+
+export function getSessionUser(req: Request): { id: string; username: string; role: AdminRole } | null {
+  return readSessionToken(req);
 }

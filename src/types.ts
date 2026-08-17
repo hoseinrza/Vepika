@@ -163,5 +163,15 @@ export type AdminTab =
   | 'editor'
   | 'comments'
   | 'categories'
-  | 'seo-settings';
+  | 'seo-settings'
+  | 'users';
+
+export type AdminRole = 'admin' | 'author';
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  role: AdminRole;
+  createdAt: string;
+}
 

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import crypto from 'crypto';
 import { db } from '../db';
 import { commentFromRow } from '../mappers';
-import { requireAuth, getSessionUsername } from '../auth';
+import { requireAdmin, getSessionUsername } from '../auth';
 import { Comment, CommentStatus } from '../../src/types';
 
 export const commentsRouter = Router();
@@ -71,7 +71,7 @@ commentsRouter.post('/', (req, res) => {
   res.status(201).json(comment);
 });
 
-commentsRouter.patch('/:id/status', requireAuth, (req, res) => {
+commentsRouter.patch('/:id/status', requireAdmin, (req, res) => {
   const { status } = req.body as { status: CommentStatus };
   if (!['approved', 'pending', 'spam', 'rejected'].includes(status)) {
     return res.status(400).json({ error: 'وضعیت نامعتبر است' });
@@ -81,13 +81,13 @@ commentsRouter.patch('/:id/status', requireAuth, (req, res) => {
   res.json({ status });
 });
 
-commentsRouter.delete('/:id', requireAuth, (req, res) => {
+commentsRouter.delete('/:id', requireAdmin, (req, res) => {
   const result = db.prepare('DELETE FROM comments WHERE id = ?').run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: 'دیدگاه یافت نشد' });
   res.status(204).end();
 });
 
-commentsRouter.post('/:id/reply', requireAuth, (req, res) => {
+commentsRouter.post('/:id/reply', requireAdmin, (req, res) => {
   const { content } = req.body as { content: string };
   if (!content) return res.status(400).json({ error: 'متن پاسخ الزامی است' });
 

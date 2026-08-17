@@ -21,6 +21,7 @@ import { analyzeArticleSeo, formatPersianDate, toPersianDigits } from '../../uti
 interface AdminArticlesListProps {
   articles: Article[];
   categories: Category[];
+  canFeature?: boolean;
   onNewArticle: () => void;
   onEditArticle: (article: Article) => void;
   onDeleteArticle: (id: string) => Promise<void>;
@@ -33,6 +34,7 @@ interface AdminArticlesListProps {
 export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
   articles,
   categories,
+  canFeature = true,
   onNewArticle,
   onEditArticle,
   onDeleteArticle,
@@ -259,18 +261,20 @@ export const AdminArticlesList: React.FC<AdminArticlesListProps> = ({
                       {/* Actions */}
                       <td className="py-3.5 px-4 text-left">
                         <div className="flex items-center justify-end gap-1.5">
-                          {/* Set as Hero Article */}
-                          <button
-                            onClick={() => runOrAlert(() => onSetFeatured(art.id), 'تغییر مقاله ویژه ناموفق بود.')}
-                            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                              art.featured
-                                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
-                                : 'text-stone-400 hover:text-amber-600 hover:bg-amber-50'
-                            }`}
-                            title={art.featured ? 'حذف از حالت مقاله ویژه هیرو' : 'انتخاب به عنوان مقاله ویژه هیرو صفحه اصلی'}
-                          >
-                            <Star className={`w-4 h-4 ${art.featured ? 'fill-amber-500' : ''}`} />
-                          </button>
+                          {/* Set as Hero Article (admin only — site-wide decision) */}
+                          {canFeature && (
+                            <button
+                              onClick={() => runOrAlert(() => onSetFeatured(art.id), 'تغییر مقاله ویژه ناموفق بود.')}
+                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                art.featured
+                                  ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-50'
+                                  : 'text-stone-400 hover:text-amber-600 hover:bg-amber-50'
+                              }`}
+                              title={art.featured ? 'حذف از حالت مقاله ویژه هیرو' : 'انتخاب به عنوان مقاله ویژه هیرو صفحه اصلی'}
+                            >
+                              <Star className={`w-4 h-4 ${art.featured ? 'fill-amber-500' : ''}`} />
+                            </button>
+                          )}
 
                           {/* Live View */}
                           <button

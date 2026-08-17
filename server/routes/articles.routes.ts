@@ -2,13 +2,14 @@ import { Router } from 'express';
 import crypto from 'crypto';
 import { db } from '../db';
 import { articleFromRow, articleToRow } from '../mappers';
-import { requireAuth, getSessionUsername } from '../auth';
+import { requireAuth, requireAdmin, getSessionUser } from '../auth';
 import { slugify, ensureUniqueSlug } from '../slugify';
 import { Article } from '../../src/types';
 
 export const articlesRouter = Router();
 
 const clearOtherFeatured = db.prepare('UPDATE articles SET featured = 0 WHERE id != ?');
+const setOwner = db.prepare('UPDATE articles SET ownerUserId = ? WHERE id = ?');
 const insertArticleStmt = db.prepare(`
   INSERT INTO articles (
     id, slug, title, content, excerpt, coverImage, coverImageAlt, author, categoryId,
@@ -32,8 +33,9 @@ const updateArticleStmt = db.prepare(`
 `);
 
 // Only one article can be "the" hero/featured article at a time.
-const insertArticle = db.transaction((article: Article) => {
+const insertArticle = db.transaction((article: Article, ownerUserId: string) => {
   insertArticleStmt.run(articleToRow(article));
+  setOwner.run(ownerUserId, article.id);
   if (article.featured) clearOtherFeatured.run(article.id);
 });
 const updateArticle = db.transaction((article: Article) => {
@@ -41,11 +43,26 @@ const updateArticle = db.transaction((article: Article) => {
   if (article.featured) clearOtherFeatured.run(article.id);
 });
 
+// Authors may only touch their own articles; admins may touch any.
+function canModify(req: import('express').Request, row: { ownerUserId: string | null }): boolean {
+  if (req.admin!.role === 'admin') return true;
+  return row.ownerUserId === req.admin!.id;
+}
+
 articlesRouter.get('/', (req, res) => {
-  const wantsAll = req.query.all === '1' && !!getSessionUsername(req);
-  const rows = wantsAll
-    ? db.prepare('SELECT * FROM articles ORDER BY publishDate DESC').all()
-    : db.prepare("SELECT * FROM articles WHERE status = 'published' ORDER BY publishDate DESC").all();
+  const user = getSessionUser(req);
+  const wantsAll = req.query.all === '1' && !!user;
+
+  if (!wantsAll) {
+    const rows = db.prepare("SELECT * FROM articles WHERE status = 'published' ORDER BY publishDate DESC").all();
+    return res.json((rows as any[]).map(articleFromRow));
+  }
+
+  const rows =
+    user!.role === 'author'
+      ? db.prepare('SELECT * FROM articles WHERE ownerUserId = ? ORDER BY publishDate DESC').all(user!.id)
+      : db.prepare('SELECT * FROM articles ORDER BY publishDate DESC').all();
+
   res.json((rows as any[]).map(articleFromRow));
 });
 
@@ -54,7 +71,7 @@ articlesRouter.get('/:id', (req, res) => {
     .prepare('SELECT * FROM articles WHERE id = ? OR slug = ?')
     .get(req.params.id, req.params.id) as any;
   if (!row) return res.status(404).json({ error: 'مقاله یافت نشد' });
-  if (row.status !== 'published' && !getSessionUsername(req)) {
+  if (row.status !== 'published' && !getSessionUser(req)) {
     return res.status(404).json({ error: 'مقاله یافت نشد' });
   }
   res.json(articleFromRow(row));
@@ -78,7 +95,7 @@ articlesRouter.post('/', requireAuth, (req, res) => {
     likesCount: 0,
   };
 
-  insertArticle(article);
+  insertArticle(article, req.admin!.id);
 
   res.status(201).json(article);
 });
@@ -86,6 +103,9 @@ articlesRouter.post('/', requireAuth, (req, res) => {
 articlesRouter.put('/:id', requireAuth, (req, res) => {
   const existing = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id) as any;
   if (!existing) return res.status(404).json({ error: 'مقاله یافت نشد' });
+  if (!canModify(req, existing)) {
+    return res.status(403).json({ error: 'فقط نویسنده این مقاله یا مدیر کل می‌تواند آن را ویرایش کند' });
+  }
 
   const body = req.body as Article;
   const newSlug =
@@ -107,14 +127,24 @@ articlesRouter.put('/:id', requireAuth, (req, res) => {
 });
 
 articlesRouter.delete('/:id', requireAuth, (req, res) => {
-  const result = db.prepare('DELETE FROM articles WHERE id = ?').run(req.params.id);
-  if (result.changes === 0) return res.status(404).json({ error: 'مقاله یافت نشد' });
+  const existing = db.prepare('SELECT ownerUserId FROM articles WHERE id = ?').get(req.params.id) as
+    | { ownerUserId: string | null }
+    | undefined;
+  if (!existing) return res.status(404).json({ error: 'مقاله یافت نشد' });
+  if (!canModify(req, existing)) {
+    return res.status(403).json({ error: 'فقط نویسنده این مقاله یا مدیر کل می‌تواند آن را حذف کند' });
+  }
+
+  db.prepare('DELETE FROM articles WHERE id = ?').run(req.params.id);
   res.status(204).end();
 });
 
 articlesRouter.post('/:id/duplicate', requireAuth, (req, res) => {
   const existing = db.prepare('SELECT * FROM articles WHERE id = ?').get(req.params.id) as any;
   if (!existing) return res.status(404).json({ error: 'مقاله یافت نشد' });
+  if (!canModify(req, existing)) {
+    return res.status(403).json({ error: 'فقط نویسنده این مقاله یا مدیر کل می‌تواند آن را تکثیر کند' });
+  }
 
   const source = articleFromRow(existing);
   const now = new Date().toISOString();
@@ -134,15 +164,19 @@ articlesRouter.post('/:id/duplicate', requireAuth, (req, res) => {
   };
 
   insertArticleStmt.run(articleToRow(duplicate));
+  setOwner.run(req.admin!.id, duplicate.id);
 
   res.status(201).json(duplicate);
 });
 
 articlesRouter.patch('/:id/status', requireAuth, (req, res) => {
-  const existing = db.prepare('SELECT status FROM articles WHERE id = ?').get(req.params.id) as
-    | { status: string }
+  const existing = db.prepare('SELECT status, ownerUserId FROM articles WHERE id = ?').get(req.params.id) as
+    | { status: string; ownerUserId: string | null }
     | undefined;
   if (!existing) return res.status(404).json({ error: 'مقاله یافت نشد' });
+  if (!canModify(req, existing)) {
+    return res.status(403).json({ error: 'فقط نویسنده این مقاله یا مدیر کل می‌تواند وضعیت آن را تغییر دهد' });
+  }
 
   const nextStatus = existing.status === 'published' ? 'draft' : 'published';
   db.prepare('UPDATE articles SET status = ?, updatedAt = ? WHERE id = ?').run(
@@ -154,8 +188,8 @@ articlesRouter.patch('/:id/status', requireAuth, (req, res) => {
 });
 
 // Sets/unsets this article as THE hero article shown in the homepage spotlight.
-// Setting one clears the flag on every other article — there's only ever one.
-articlesRouter.patch('/:id/feature', requireAuth, (req, res) => {
+// Site-wide decision, so it's an admin-only action regardless of article ownership.
+articlesRouter.patch('/:id/feature', requireAdmin, (req, res) => {
   const existing = db.prepare('SELECT id, featured FROM articles WHERE id = ?').get(req.params.id) as
     | { id: string; featured: number }
     | undefined;
