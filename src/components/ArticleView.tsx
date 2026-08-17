@@ -194,6 +194,55 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   const headings = extractHeadings(article.content);
 
+  // Render inline markdown (bold, italic, inline code, links) within a block of text
+  const renderInline = (text: string): React.ReactNode[] => {
+    const pattern = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[(.+?)\]\((.+?)\)/g;
+    const nodes: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let key = 0;
+
+    while ((match = pattern.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        nodes.push(text.slice(lastIndex, match.index));
+      }
+
+      if (match[1] !== undefined) {
+        nodes.push(<strong key={key++} className="font-bold text-slate-900">{match[1]}</strong>);
+      } else if (match[2] !== undefined) {
+        nodes.push(<em key={key++}>{match[2]}</em>);
+      } else if (match[3] !== undefined) {
+        nodes.push(
+          <code key={key++} className="px-1.5 py-0.5 bg-slate-100 text-red-600 rounded-md font-mono text-[0.85em] dir-ltr inline-block">
+            {match[3]}
+          </code>
+        );
+      } else if (match[4] !== undefined && match[5] !== undefined) {
+        const url = match[5];
+        const isExternal = /^https?:\/\//.test(url);
+        nodes.push(
+          <a
+            key={key++}
+            href={url}
+            target={isExternal ? '_blank' : undefined}
+            rel={isExternal ? 'noopener noreferrer' : undefined}
+            className="text-red-600 hover:text-red-700 underline underline-offset-2 decoration-red-300 font-medium"
+          >
+            {match[4]}
+          </a>
+        );
+      }
+
+      lastIndex = pattern.lastIndex;
+    }
+
+    if (lastIndex < text.length) {
+      nodes.push(text.slice(lastIndex));
+    }
+
+    return nodes;
+  };
+
   // Render markdown with custom Redwebs typography
   const renderMarkdown = (content: string) => {
     const paragraphs = content.split('\n\n');
@@ -228,7 +277,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       if (trimmed.startsWith('> ')) {
         return (
           <blockquote key={index} className="border-r-4 border-red-600 pr-4 py-3 my-5 bg-red-50/80 rounded-l-xl text-red-950">
-            <p className="font-medium text-sm leading-relaxed">{trimmed.replace('> ', '')}</p>
+            <p className="font-medium text-sm leading-relaxed">{renderInline(trimmed.replace('> ', ''))}</p>
           </blockquote>
         );
       }
@@ -274,7 +323,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         return (
           <ul key={index} className="list-disc pr-6 my-4 space-y-2 text-slate-700 text-sm sm:text-base leading-relaxed">
             {items.map((item, i) => (
-              <li key={i}>{item}</li>
+              <li key={i}>{renderInline(item)}</li>
             ))}
           </ul>
         );
@@ -286,7 +335,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         return (
           <ol key={index} className="list-decimal pr-6 my-4 space-y-2 text-slate-700 text-sm sm:text-base leading-relaxed">
             {items.map((item, i) => (
-              <li key={i}>{item}</li>
+              <li key={i}>{renderInline(item)}</li>
             ))}
           </ol>
         );
@@ -300,7 +349,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       // Standard Paragraph
       return (
         <p key={index} className="text-slate-700 text-base sm:text-[17px] leading-loose text-justify my-4">
-          {trimmed}
+          {renderInline(trimmed)}
         </p>
       );
     });

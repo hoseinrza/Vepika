@@ -87,7 +87,7 @@ export const CategoriesIndexView: React.FC<CategoriesIndexViewProps> = ({
           const categoryArticles = articles.filter(
             (a) => a.categoryId === cat.id && a.status === 'published'
           );
-          const postCount = categoryArticles.length || cat.postCount || 1;
+          const postCount = categoryArticles.length || cat.postCount || 0;
 
           return (
             <div

@@ -153,7 +153,6 @@ export type ViewMode =
   | 'category'
   | 'categories-index'
   | 'tools'
-  | 'design-system'
   | 'admin'
   | 'blog'
   | 'toolkit';

@@ -287,7 +287,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 max-w-md">
-            محتواهای ردوبز در ۱۰ دسته‌بندی موضوعی استاندارد برای یادگیری مهارت‌های واقعی توسعه وب تنظیم شده‌اند.
+            محتواهای ردوبز در {toPersianDigits(categories.length)} دسته‌بندی موضوعی استاندارد برای یادگیری مهارت‌های واقعی توسعه وب تنظیم شده‌اند.
           </p>
         </div>
 
@@ -306,7 +306,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   {getCategoryIcon(cat.slug)}
                 </div>
                 <span className="text-[11px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
-                  {toPersianDigits(cat.postCount || 1)} مقاله
+                  {toPersianDigits(cat.postCount ?? 0)} مقاله
                 </span>
               </div>
 

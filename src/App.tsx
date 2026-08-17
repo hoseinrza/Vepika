@@ -8,7 +8,6 @@ import { CategoryView } from './components/CategoryView';
 import { CategoriesIndexView } from './components/CategoriesIndexView';
 import { ArticleView } from './components/ArticleView';
 import { WordPressToolkit } from './components/WordPressToolkit';
-import { DesignSystemView } from './components/DesignSystemView';
 import { SearchModal } from './components/SearchModal';
 import { BookmarksDrawer } from './components/BookmarksDrawer';
 import { AdminLayout } from './components/admin/AdminLayout';
@@ -160,8 +159,6 @@ export function App() {
       document.title = `پیشخوان مدیریت | ${settings.siteTitle}`;
     } else if (location.pathname === '/toolkit') {
       document.title = `جعبه ابزار و اسنیپت‌های مهندسی وب | ${settings.siteTitle}`;
-    } else if (location.pathname === '/design-system') {
-      document.title = `سیستم دیزاین برند ردوبز | ${settings.siteTitle}`;
     } else if (location.pathname === '/categories') {
       document.title = `دسته‌بندی‌های تخصصی آموزش وب و وردپرس | ${settings.siteTitle}`;
     } else {
@@ -234,9 +231,6 @@ export function App() {
         break;
       case 'toolkit':
         navigate('/toolkit');
-        break;
-      case 'design-system':
-        navigate('/design-system');
         break;
       default:
         break;
@@ -424,8 +418,6 @@ export function App() {
   // Render Public Website views
   const currentViewMode: ViewMode = location.pathname === '/toolkit'
     ? 'toolkit'
-    : location.pathname === '/design-system'
-    ? 'design-system'
     : location.pathname === '/categories'
     ? 'categories-index'
     : matchPath('/category/:slug', location.pathname)
@@ -521,8 +513,6 @@ export function App() {
 
           <Route path="/toolkit" element={<WordPressToolkit onBack={() => navigate('/')} />} />
 
-          <Route path="/design-system" element={<DesignSystemView onBack={() => navigate('/')} />} />
-
           <Route path="*" element={<NotFoundView />} />
         </Routes>
       </main>
@@ -534,10 +524,6 @@ export function App() {
         onSelectCategory={handleSelectCategory}
         onOpenToolkit={() => {
           navigate('/toolkit');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenDesignSystem={() => {
-          navigate('/design-system');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />

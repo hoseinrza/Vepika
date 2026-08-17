@@ -691,7 +691,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertMarkdown('[عنوان لینک](', 'https://...)')}
+                    onClick={() => insertMarkdown('[', '](https://...)')}
                     className="p-1 hover:bg-white rounded cursor-pointer"
                     title="درج پیوند"
                   >
@@ -699,7 +699,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => insertMarkdown('![توضیح تصویر](', 'https://...)')}
+                    onClick={() => insertMarkdown('![', '](https://...)')}
                     className="p-1 hover:bg-white rounded cursor-pointer"
                     title="درج تصویر"
                   >

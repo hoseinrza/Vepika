@@ -7,7 +7,6 @@ import {
   Code2,
   ArrowUp,
   Wrench,
-  Sliders,
   Layers,
   Cpu,
   Terminal,
@@ -26,7 +25,6 @@ interface FooterProps {
   settings: SiteSettings;
   onSelectCategory: (id: string | null) => void;
   onOpenToolkit?: () => void;
-  onOpenDesignSystem?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -34,7 +32,6 @@ export const Footer: React.FC<FooterProps> = ({
   settings,
   onSelectCategory,
   onOpenToolkit,
-  onOpenDesignSystem,
 }) => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -179,17 +176,6 @@ export const Footer: React.FC<FooterProps> = ({
                   >
                     <Wrench className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
                     <span>جعبه ابزار کدهای وردپرس</span>
-                  </button>
-                </li>
-              )}
-              {onOpenDesignSystem && (
-                <li>
-                  <button
-                    onClick={onOpenDesignSystem}
-                    className="hover:text-purple-400 transition-colors flex items-center gap-2 cursor-pointer group"
-                  >
-                    <Sliders className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
-                    <span>سیستم دیزاین برند</span>
                   </button>
                 </li>
               )}

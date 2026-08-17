@@ -9,7 +9,6 @@ import {
   ChevronDown,
   Layers,
   Sparkles,
-  Sliders,
   ArrowLeft,
   Flame,
   Code2,
@@ -238,19 +237,6 @@ export const Header: React.FC<HeaderProps> = ({
                   PRO
                 </span>
               </button>
-
-              {/* Design System */}
-              <button
-                onClick={() => onNavigate('design-system')}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                  viewMode === 'design-system'
-                    ? 'text-purple-600 bg-purple-50/90 font-extrabold shadow-2xs'
-                    : 'text-slate-700 hover:text-purple-600 hover:bg-slate-100/70'
-                }`}
-              >
-                <Sliders className="w-3.5 h-3.5 text-purple-600" />
-                <span>دیزاین سیستم</span>
-              </button>
             </nav>
           </div>
 
@@ -357,22 +343,6 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-mono">
               WP
-            </span>
-          </button>
-
-          <button
-            onClick={() => {
-              onNavigate('design-system');
-              setIsMobileMenuOpen(false);
-            }}
-            className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-purple-50 hover:text-purple-600 transition-colors flex items-center justify-between whitespace-nowrap"
-          >
-            <div className="flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-purple-600" />
-              <span>دیزاین سیستم ردوبز</span>
-            </div>
-            <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-md">
-              UI Kit
             </span>
           </button>
         </div>

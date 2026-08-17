@@ -1,0 +1,71 @@
+{
+  "colors": [
+    {
+      "name": "Redwebs Red (اصلی)",
+      "hex": "#DC2626",
+      "description": "رنگ هویت اصلی، دکمه‌های اقدام، پیوندها و المان‌های تعاملی. نماد اعتماد، فناوری و قدرت اجرایی."
+    },
+    {
+      "name": "Redwebs Dark (تاریک)",
+      "hex": "#0F172A",
+      "description": "تیترهای اصلی، هدرها، فوتر و کنتراست‌های عمیق. نماد استحکام، پرستیژ فنی و ثبات رسانه‌ای."
+    },
+    {
+      "name": "Redwebs Orange (اکسنت فرعی)",
+      "hex": "#F97316",
+      "description": "استفاده به جا برای برچسب‌های ویژه، نشان‌های نوآوری و طراحی UI/UX. نماد خلاقیت و دانش نوین."
+    },
+    {
+      "name": "Background & Surface",
+      "hex": "#F8FAFC / #FFFFFF",
+      "description": "پس‌زمینه مات و آرامش‌بخش برای مطالعه مقالات طولانی بدون خستگی چشم کاربر."
+    }
+  ],
+  "typography": {
+    "fonts": {
+      "display": "Lalezar",
+      "body": "Vazirmatn",
+      "mono": "JetBrains Mono"
+    },
+    "scale": [
+      { "role": "Display / H1", "font": "Lalezar", "usage": "عناوین و برندینگ" },
+      { "role": "Display / H2", "font": "Lalezar", "usage": "عناوین بخش‌ها و کارت‌ها" },
+      { "role": "H3", "font": "Vazirmatn", "size": "18px / 1.125rem", "weight": 700, "usage": "زیرعنوان‌ها" },
+      { "role": "Body", "font": "Vazirmatn", "size": "16px / 1rem", "lineHeight": 2.0, "usage": "متن بدنه مقالات" },
+      { "role": "Code", "font": "JetBrains Mono", "size": "14px", "usage": "بلاک‌های کد و اسنیپت" }
+    ]
+  },
+  "buttons": [
+    { "variant": "primary", "label": "دکمه اصلی (Primary)", "background": "#DC2626", "hoverBackground": "#B91C1C", "textColor": "#FFFFFF" },
+    { "variant": "dark", "label": "دکمه تیره (Dark Action)", "background": "#0F172A", "hoverBackground": "#1E293B", "textColor": "#FFFFFF" },
+    { "variant": "accent", "label": "دکمه اکستنشن (Accent)", "background": "#9333EA", "hoverBackground": "#7E22CE", "textColor": "#FFFFFF" },
+    { "variant": "outline", "label": "دکمه خطی (Outline)", "background": "#FFFFFF", "border": "#CBD5E1", "textColor": "#1E293B" },
+    { "variant": "ghost", "label": "دکمه متنی (Ghost)", "background": "transparent", "textColor": "#475569" },
+    { "variant": "danger", "label": "دکمه هشدار (Danger)", "background": "#F43F5E", "hoverBackground": "#E11D48", "textColor": "#FFFFFF" }
+  ],
+  "badges": {
+    "difficulty": [
+      { "label": "مقدماتی (Beginner)", "textColor": "#047857", "background": "#ECFDF5", "border": "#A7F3D0" },
+      { "label": "متوسط (Intermediate)", "textColor": "#B91C1C", "background": "#FEF2F2", "border": "#FECACA" },
+      { "label": "پیشرفته (Advanced)", "textColor": "#7E22CE", "background": "#FAF5FF", "border": "#E9D5FF" }
+    ],
+    "contentTypes": [
+      { "label": "آموزش گام‌به‌گام", "background": "#DC2626", "textColor": "#FFFFFF" },
+      { "label": "مقاله تخصصی", "background": "#1E293B", "textColor": "#E2E8F0" },
+      { "label": "اسنیپت و کد سریع", "background": "#F59E0B", "textColor": "#0A0A0A" },
+      { "label": "راهنمای جامع", "background": "#9333EA", "textColor": "#FFFFFF" }
+    ]
+  },
+  "callouts": [
+    { "type": "info", "title": "نکته آموزشی ردوبز", "textColor": "#7F1D1D", "background": "#FEF2F2", "border": "#FECACA" },
+    { "type": "success", "title": "نتیجه بهینه‌سازی", "textColor": "#064E3B", "background": "#ECFDF5", "border": "#A7F3D0" },
+    { "type": "warning", "title": "هشدار امنیتی", "textColor": "#78350F", "background": "#FFFBEB", "border": "#FDE68A" }
+  ],
+  "codeBlock": {
+    "background": "#0F172A",
+    "headerBackground": "#020617",
+    "textColor": "#E2E8F0",
+    "font": "JetBrains Mono",
+    "fontSize": "14px"
+  }
+}
