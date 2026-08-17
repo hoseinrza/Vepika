@@ -60,7 +60,7 @@ export const AdminSeoSettings: React.FC<AdminSeoSettingsProps> = ({
 
   // Export full JSON backup (server streams the current DB content)
   const handleExportData = () => {
-    window.open('/api/backup/export', '_blank');
+    window.open('/api/backup', '_blank');
   };
 
   // Import JSON backup — server validates and restores it

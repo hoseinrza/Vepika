@@ -319,7 +319,7 @@ export function App() {
   };
 
   const handleImportData = async (data: any) => {
-    await api.post('/backup/import', data);
+    await api.post('/backup', data);
     await loadAllContent();
   };
 

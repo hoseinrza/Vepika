@@ -6,7 +6,7 @@ import { backupImportSchema } from '../schemas/backup.schema';
 
 export const backupRouter = Router();
 
-backupRouter.get('/export', requireAuth, (_req, res) => {
+backupRouter.get('/', requireAuth, (_req, res) => {
   const categoryRows = db.prepare('SELECT * FROM categories').all() as any[];
   const countStmt = db.prepare('SELECT COUNT(*) as count FROM articles WHERE categoryId = ?');
   const categories = categoryRows.map((row) => categoryFromRow(row, (countStmt.get(row.id) as any).count));
@@ -25,7 +25,7 @@ backupRouter.get('/export', requireAuth, (_req, res) => {
   res.json({ version: '1.0.0', exportedAt: new Date().toISOString(), settings, categories, articles, comments });
 });
 
-backupRouter.post('/import', requireAuth, (req, res) => {
+backupRouter.post('/', requireAuth, (req, res) => {
   const parsed = backupImportSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: 'فرمت فایل پشتیبان معتبر نیست', details: parsed.error.issues });
