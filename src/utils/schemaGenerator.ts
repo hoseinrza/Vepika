@@ -1,5 +1,13 @@
 import { Article, Category, SiteSettings } from '../types';
 
+// Collects whichever social/profile URLs are actually configured in Settings into
+// a schema.org sameAs array — never fabricates a profile that wasn't entered.
+function collectSameAs(settings?: Partial<SiteSettings>): string[] {
+  if (!settings) return [];
+  return [settings.githubUrl, settings.twitterUrl, settings.instagramUrl, settings.youtubeUrl]
+    .filter((url): url is string => !!url && url.trim().length > 0);
+}
+
 /**
  * Generates JSON-LD Schema data for an Article based on schema.org standards
  */
@@ -9,6 +17,7 @@ export function generateArticleSchema(article: Article, category?: Category, set
   const authorName = article.author?.name || settings?.authorName || 'تحریریه ردوبز';
   const authorBio = article.author?.bio || settings?.authorBio || 'نویسنده و پژوهشگر حوزه فناوری و آموزش';
   const publisherName = settings?.siteTitle || 'ردوبز';
+  const orgSameAs = collectSameAs(settings);
 
   // Base Article / BlogPosting Schema
   const schema: any = {
@@ -51,6 +60,7 @@ export function generateArticleSchema(article: Article, category?: Category, set
         '@type': 'ImageObject',
         'url': `${siteUrl}/logo.png`,
       },
+      ...(orgSameAs.length > 0 ? { sameAs: orgSameAs } : {}),
     },
     'articleSection': category?.name || 'آموزش',
     'keywords': (article.tags || []).join(', '),
@@ -107,6 +117,7 @@ export function generateBreadcrumbSchema(article: Article, category?: Category, 
  * Generates Website Schema
  */
 export function generateWebsiteSchema(settings: SiteSettings) {
+  const orgSameAs = collectSameAs(settings);
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -122,29 +133,121 @@ export function generateWebsiteSchema(settings: SiteSettings) {
     },
     'publisher': {
       '@type': 'Organization',
+      '@id': `${settings.siteUrl}#organization`,
       'name': settings.siteTitle,
+      'url': settings.siteUrl,
       'logo': {
         '@type': 'ImageObject',
         'url': `${settings.siteUrl}/logo.png`,
       },
+      ...(orgSameAs.length > 0 ? { sameAs: orgSameAs } : {}),
     },
+  };
+}
+
+/**
+ * Generates CollectionPage Schema for a category/topic listing page
+ */
+export function generateCategorySchema(
+  category: Category,
+  articleCount: number,
+  settings?: Partial<SiteSettings>
+) {
+  const siteUrl = settings?.siteUrl || 'https://redwebs.ir';
+  const categoryUrl = `${siteUrl}/category/${category.slug}`;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${categoryUrl}#collectionpage`,
+    'url': categoryUrl,
+    'name': category.name,
+    'description': category.description || `مجموعه آموزش‌های ${category.name} در ${settings?.siteTitle || 'ردوبز'}`,
+    'inLanguage': 'fa-IR',
+    'isPartOf': {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}#website`,
+    },
+    'about': {
+      '@type': 'Thing',
+      'name': category.name,
+    },
+    'mainEntity': {
+      '@type': 'ItemList',
+      'numberOfItems': articleCount,
+    },
+  };
+}
+
+/**
+ * Generates a two-level BreadcrumbList (Home > Category) for category pages
+ */
+export function generateCategoryBreadcrumbSchema(category: Category, siteUrl: string = 'https://redwebs.ir') {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'صفحه اصلی',
+        'item': siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': category.name,
+        'item': `${siteUrl}/category/${category.slug}`,
+      },
+    ],
   };
 }
 
 /**
  * Live updater for document head metadata tags and JSON-LD scripts
  */
-export function applyHeadMetadata(article?: Article, category?: Category, settings?: SiteSettings) {
+export function applyHeadMetadata(
+  article?: Article,
+  category?: Category,
+  settings?: SiteSettings,
+  categoryArticleCount: number = 0
+) {
   if (typeof document === 'undefined') return;
 
   const siteTitle = settings?.siteTitle || 'ردوبز';
   const siteUrl = settings?.siteUrl || 'https://redwebs.ir';
+
+  // Category listing page (no specific article selected)
+  if (!article && category) {
+    const title = `${category.name} | ${siteTitle}`;
+    const description = category.description || `مجموعه آموزش‌های ${category.name} در ${siteTitle}`;
+    const canonical = `${siteUrl}/category/${category.slug}`;
+
+    document.title = title;
+    setMeta('description', description);
+    setMeta('robots', 'index, follow');
+    setCanonical(canonical);
+    setOgMeta('og:title', title);
+    setOgMeta('og:description', description);
+    setOgMeta('og:type', 'website');
+    setOgMeta('og:url', canonical);
+    setOgMeta('og:image', settings?.defaultOgImage || '');
+    setTwitterMeta('twitter:card', 'summary_large_image');
+    setTwitterMeta('twitter:title', title);
+    setTwitterMeta('twitter:description', description);
+    setTwitterMeta('twitter:image', settings?.defaultOgImage || '');
+
+    injectJsonLd('article-schema', generateCategorySchema(category, categoryArticleCount, settings));
+    injectJsonLd('breadcrumb-schema', generateCategoryBreadcrumbSchema(category, siteUrl));
+    removeJsonLd('website-schema');
+    return;
+  }
 
   if (!article) {
     // Default homepage meta
     document.title = `${siteTitle} | ${settings?.siteTagline || 'مرجع تخصصی مقالات آموزشی'}`;
     setMeta('description', settings?.siteDescription || 'وبلاگ آموزشی مینیمال با فونت لاله‌زار');
     setMeta('robots', 'index, follow');
+    setCanonical(siteUrl);
     setOgMeta('og:title', document.title);
     setOgMeta('og:description', settings?.siteDescription || '');
     setOgMeta('og:type', 'website');
@@ -154,7 +257,7 @@ export function applyHeadMetadata(article?: Article, category?: Category, settin
     setTwitterMeta('twitter:title', document.title);
     setTwitterMeta('twitter:description', settings?.siteDescription || '');
     setTwitterMeta('twitter:image', settings?.defaultOgImage || '');
-    
+
     // Website JSON-LD
     if (settings) {
       injectJsonLd('website-schema', generateWebsiteSchema(settings));
@@ -200,6 +303,7 @@ export function applyHeadMetadata(article?: Article, category?: Category, settin
   // Inject JSON-LD Schema
   injectJsonLd('article-schema', generateArticleSchema(article, category, settings));
   injectJsonLd('breadcrumb-schema', generateBreadcrumbSchema(article, category, siteUrl));
+  removeJsonLd('website-schema');
 }
 
 function setMeta(name: string, content: string) {

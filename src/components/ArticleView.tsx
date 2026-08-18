@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ArrowRight,
   Clock,
@@ -372,19 +373,25 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       {/* Main Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-6">
         {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between gap-4 pb-6 text-xs sm:text-sm text-slate-500 border-b border-slate-200">
+        <nav aria-label="breadcrumb" className="flex items-center justify-between gap-4 pb-6 text-xs sm:text-sm text-slate-500 border-b border-slate-200">
           <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={onBack}
+            <Link
+              to="/"
               className="text-slate-700 hover:text-red-600 font-bold transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <ArrowRight className="w-4 h-4" />
               <span>خانه</span>
-            </button>
+            </Link>
             <span>/</span>
-            <span className="text-red-600 font-bold">{category?.name || 'آموزش'}</span>
+            {category ? (
+              <Link to={`/category/${category.slug}`} className="text-red-600 font-bold hover:underline">
+                {category.name}
+              </Link>
+            ) : (
+              <span className="text-red-600 font-bold">آموزش</span>
+            )}
             <span>/</span>
-            <span className="text-slate-400 truncate max-w-[200px] sm:max-w-xs">{article.title}</span>
+            <span className="text-slate-400 truncate max-w-[200px] sm:max-w-xs" aria-current="page">{article.title}</span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
@@ -411,7 +418,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
               <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-white' : ''}`} />
             </button>
           </div>
-        </div>
+        </nav>
 
         {/* Article Header & Typography */}
         <header className="py-8 space-y-6">
@@ -702,6 +709,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             src={article.author.avatar}
             alt={article.author.name}
             referrerPolicy="no-referrer"
+            loading="lazy"
             className="w-20 h-20 rounded-2xl object-cover border-2 border-red-500 shadow-md shrink-0"
           />
           <div className="space-y-2 text-center sm:text-right">
@@ -724,8 +732,9 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {relatedArticles.slice(0, 2).map((rel) => (
-                <div
+                <Link
                   key={rel.id}
+                  to={`/article/${rel.slug}`}
                   onClick={() => onSelectArticle(rel)}
                   className="bg-white p-4 rounded-2xl border border-slate-200 hover:border-red-500 transition-all cursor-pointer flex gap-4 group shadow-2xs"
                 >
@@ -733,6 +742,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                     src={rel.coverImage}
                     alt={rel.title}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
                     className="w-24 h-24 rounded-xl object-cover shrink-0"
                   />
                   <div className="space-y-2 flex-1 flex flex-col justify-between">
@@ -744,7 +754,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                       <span>{toPersianDigits(rel.readingTimeMinutes)} دقیقه</span>
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>
@@ -825,6 +835,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
                       <img
                         src={comment.authorAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(comment.authorName)}`}
                         alt={comment.authorName}
+                        loading="lazy"
                         className="w-8 h-8 rounded-full border border-slate-200"
                       />
                       <div className="flex flex-col">

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Clock, Eye, Heart, Bookmark, ArrowLeft, Sparkles, BookOpen, Layers } from 'lucide-react';
 import { Article, Category } from '../types';
 import { formatPersianDate, toPersianDigits } from '../utils/seoAnalyzer';
@@ -42,8 +43,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
 
   return (
     <article
-      onClick={handleClick}
-      className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-red-500/80 hover:shadow-2xl hover:shadow-red-600/15 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 ease-out flex flex-col cursor-pointer transform-gpu will-change-transform"
+      className="group relative bg-white rounded-2xl border border-slate-200/90 overflow-hidden hover:border-red-500/80 hover:shadow-2xl hover:shadow-red-600/15 hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 ease-out flex flex-col cursor-pointer transform-gpu will-change-transform"
       id={`article-card-${article.slug}`}
       dir="rtl"
     >
@@ -179,6 +179,15 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Full-card crawlable link — real <a href>, sits above static content but
+          below the z-10 bookmark/badges so they stay independently clickable */}
+      <Link
+        to={`/article/${article.slug}`}
+        onClick={handleClick}
+        className="absolute inset-0 z-0"
+        aria-label={article.title}
+      />
     </article>
   );
 };

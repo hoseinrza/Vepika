@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Heart,
@@ -121,11 +122,9 @@ export const Footer: React.FC<FooterProps> = ({
             <ul className="space-y-2.5 text-xs text-slate-400">
               {categories.slice(0, 6).map((cat) => (
                 <li key={cat.id}>
-                  <button
-                    onClick={() => {
-                      onSelectCategory(cat.id);
-                      scrollToTop();
-                    }}
+                  <Link
+                    to={`/category/${cat.slug}`}
+                    onClick={scrollToTop}
                     className="hover:text-red-400 transition-colors flex items-center justify-between w-full group text-right cursor-pointer"
                   >
                     <div className="flex items-center gap-2.5">
@@ -142,7 +141,7 @@ export const Footer: React.FC<FooterProps> = ({
                         {toPersianDigits(cat.postCount)}
                       </span>
                     )}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -157,28 +156,24 @@ export const Footer: React.FC<FooterProps> = ({
 
             <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
-                <button
-                  onClick={() => {
-                    onSelectCategory(null);
-                    scrollToTop();
-                  }}
+                <Link
+                  to="/"
+                  onClick={scrollToTop}
                   className="hover:text-red-400 transition-colors cursor-pointer flex items-center gap-2"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
                   <span>صفحه اصلی رسانه</span>
-                </button>
+                </Link>
               </li>
-              {onOpenToolkit && (
-                <li>
-                  <button
-                    onClick={onOpenToolkit}
-                    className="hover:text-red-400 transition-colors flex items-center gap-2 cursor-pointer group"
-                  >
-                    <Wrench className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
-                    <span>جعبه ابزار کدهای وردپرس</span>
-                  </button>
-                </li>
-              )}
+              <li>
+                <Link
+                  to="/toolkit"
+                  className="hover:text-red-400 transition-colors flex items-center gap-2 cursor-pointer group"
+                >
+                  <Wrench className="w-3.5 h-3.5 text-red-400 group-hover:scale-110 transition-transform" />
+                  <span>جعبه ابزار کدهای وردپرس</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -1,10 +1,15 @@
 import 'dotenv/config';
 import express from 'express';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { seedIfEmpty } from './seed';
 import { bootstrapAdmin } from './auth';
+import { db } from './db';
+import { articleFromRow, categoryFromRow, settingsFromRow } from './mappers';
+import { headForArticle, headForCategory, headForHome, applyHeadToHtml } from './ssrMeta';
 import { authRouter } from './routes/auth.routes';
 import { usersRouter } from './routes/users.routes';
 import { profileRouter } from './routes/profile.routes';
@@ -23,6 +28,7 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(compression());
   app.use(express.json({ limit: '10mb' }));
   app.use(cookieParser());
 
@@ -51,8 +57,54 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+
+    const indexHtmlTemplate = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+    const countArticlesInCategory = db.prepare('SELECT COUNT(*) as count FROM articles WHERE categoryId = ?');
+
+    // Serves the SPA shell for every non-API route, but for /, /article/:slug and
+    // /category/:slug it also renders the real title/description/canonical/OG/
+    // JSON-LD into <head> server-side, and returns a genuine 404 status for
+    // unknown article/category slugs instead of always answering 200 ("soft 404").
+    // The client still re-applies the same metadata after hydration (see
+    // applyHeadMetadata in src/utils/schemaGenerator.ts) — this only makes it
+    // available to crawlers that fetch the raw HTML without executing JS.
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const settingsRow = db.prepare('SELECT * FROM settings WHERE id = 1').get();
+      if (!settingsRow) return res.send(indexHtmlTemplate);
+      const settings = settingsFromRow(settingsRow);
+
+      const articleMatch = req.path.match(/^\/article\/([^/]+)\/?$/);
+      if (articleMatch) {
+        const row = db.prepare('SELECT * FROM articles WHERE slug = ?').get(articleMatch[1]) as any;
+        if (!row || row.status !== 'published') {
+          return res.status(404).send(indexHtmlTemplate);
+        }
+        const article = articleFromRow(row);
+        const categoryRow = db.prepare('SELECT * FROM categories WHERE id = ?').get(article.categoryId) as any;
+        const category = categoryRow
+          ? categoryFromRow(categoryRow, (countArticlesInCategory.get(categoryRow.id) as { count: number }).count)
+          : undefined;
+        return res.send(applyHeadToHtml(indexHtmlTemplate, headForArticle(article, category, settings), settings.siteTitle));
+      }
+
+      const categoryMatch = req.path.match(/^\/category\/([^/]+)\/?$/);
+      if (categoryMatch) {
+        const categoryRow = db.prepare('SELECT * FROM categories WHERE slug = ?').get(categoryMatch[1]) as any;
+        if (!categoryRow) return res.status(404).send(indexHtmlTemplate);
+        const category = categoryFromRow(
+          categoryRow,
+          (countArticlesInCategory.get(categoryRow.id) as { count: number }).count
+        );
+        return res.send(
+          applyHeadToHtml(indexHtmlTemplate, headForCategory(category, category.postCount || 0, settings), settings.siteTitle)
+        );
+      }
+
+      if (req.path === '/') {
+        return res.send(applyHeadToHtml(indexHtmlTemplate, headForHome(settings), settings.siteTitle));
+      }
+
+      res.send(indexHtmlTemplate);
     });
   }
 

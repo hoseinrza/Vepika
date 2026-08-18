@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Category, ViewMode } from '../types';
 import { RedwebsLogo } from './RedwebsLogo';
 import {
@@ -83,16 +84,14 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Right: Brand Logo + Primary Nav in Single Line */}
           <div className="flex items-center gap-4 lg:gap-6 shrink-0">
             {/* Logo */}
-            <button
-              onClick={() => {
-                onSelectCategory(null);
-                onNavigate('home');
-              }}
+            <Link
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="group flex items-center gap-2.5 focus:outline-hidden cursor-pointer whitespace-nowrap"
               title="صفحه اصلی ردوبز"
             >
               <RedwebsLogo size="sm" showTagline={false} />
-            </button>
+            </Link>
 
             {/* Vertical Separator */}
             <div className="hidden lg:block w-px h-6 bg-slate-200" />
@@ -100,11 +99,9 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Desktop Navigation Items (Single Line) */}
             <nav className="hidden lg:flex items-center gap-1 whitespace-nowrap" ref={megaMenuRef}>
               {/* Home */}
-              <button
-                onClick={() => {
-                  onSelectCategory(null);
-                  onNavigate('home');
-                }}
+              <Link
+                to="/"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                   viewMode === 'home' && !selectedCategoryId
                     ? 'text-red-600 bg-red-50/90 font-extrabold shadow-2xs'
@@ -115,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {viewMode === 'home' && !selectedCategoryId && (
                   <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" />
                 )}
-              </button>
+              </Link>
 
               {/* Categories Mega Dropdown */}
               <div className="relative">
@@ -155,29 +152,24 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => {
-                          onNavigate('categories-index');
-                          setIsMegaMenuOpen(false);
-                        }}
+                      <Link
+                        to="/categories"
+                        onClick={() => setIsMegaMenuOpen(false)}
                         className="text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
                       >
                         <span>همه دسته‌ها</span>
                         <ArrowLeft className="w-3.5 h-3.5" />
-                      </button>
+                      </Link>
                     </div>
 
                     <div className="grid grid-cols-2 gap-1.5 max-h-[320px] overflow-y-auto pr-1">
                       {categories.map((cat) => {
                         const isSelected = selectedCategoryId === cat.id;
                         return (
-                          <button
+                          <Link
                             key={cat.id}
-                            onClick={() => {
-                              onSelectCategory(cat.id);
-                              onNavigate('category');
-                              setIsMegaMenuOpen(false);
-                            }}
+                            to={`/category/${cat.slug}`}
+                            onClick={() => setIsMegaMenuOpen(false)}
                             className={`p-2 text-right rounded-2xl transition-all duration-200 flex items-center justify-between gap-2.5 cursor-pointer group/item whitespace-nowrap ${
                               isSelected
                                 ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
@@ -202,7 +194,7 @@ export const Header: React.FC<HeaderProps> = ({
                             }`}>
                               {cat.postCount || 0}
                             </span>
-                          </button>
+                          </Link>
                         );
                       })}
                     </div>
@@ -223,8 +215,8 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
 
               {/* WordPress Toolkit */}
-              <button
-                onClick={() => onNavigate('toolkit')}
+              <Link
+                to="/toolkit"
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                   viewMode === 'toolkit' || viewMode === 'tools'
                     ? 'text-red-600 bg-red-50/90 font-extrabold shadow-2xs'
@@ -236,7 +228,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="bg-red-100/80 text-red-700 text-[10px] font-mono px-1.5 py-0.2 rounded-md font-bold">
                   PRO
                 </span>
-              </button>
+              </Link>
             </nav>
           </div>
 
@@ -285,23 +277,21 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Mobile Drawer Menu */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-xl px-4 py-4 space-y-2 shadow-2xl animate-in slide-in-from-top-4 duration-250">
-          <button
+          <Link
+            to="/"
             onClick={() => {
-              onSelectCategory(null);
-              onNavigate('home');
               setIsMobileMenuOpen(false);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <span>صفحه اصلی</span>
             <ArrowLeft className="w-4 h-4 text-slate-400" />
-          </button>
+          </Link>
 
-          <button
-            onClick={() => {
-              onNavigate('categories-index');
-              setIsMobileMenuOpen(false);
-            }}
+          <Link
+            to="/categories"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <div className="flex items-center gap-2">
@@ -311,30 +301,25 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-md">
               ۱۰ شاخه
             </span>
-          </button>
+          </Link>
 
           <div className="grid grid-cols-2 gap-1.5 p-2 bg-slate-50 rounded-xl border border-slate-100">
             {categories.slice(0, 4).map((cat) => (
-              <button
+              <Link
                 key={cat.id}
-                onClick={() => {
-                  onSelectCategory(cat.id);
-                  onNavigate('category');
-                  setIsMobileMenuOpen(false);
-                }}
+                to={`/category/${cat.slug}`}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className="p-1.5 text-right rounded-lg text-[11px] font-bold text-slate-700 hover:bg-white hover:text-red-600 transition-colors flex items-center gap-2 whitespace-nowrap"
               >
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
                 <span className="truncate">{cat.name}</span>
-              </button>
+              </Link>
             ))}
           </div>
 
-          <button
-            onClick={() => {
-              onNavigate('toolkit');
-              setIsMobileMenuOpen(false);
-            }}
+          <Link
+            to="/toolkit"
+            onClick={() => setIsMobileMenuOpen(false)}
             className="w-full text-right px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-red-50 hover:text-red-600 transition-colors flex items-center justify-between whitespace-nowrap"
           >
             <div className="flex items-center gap-2">
@@ -344,7 +329,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-md font-mono">
               WP
             </span>
-          </button>
+          </Link>
         </div>
       )}
     </header>

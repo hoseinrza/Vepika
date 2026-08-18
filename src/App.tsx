@@ -13,7 +13,7 @@ import { BookmarksDrawer } from './components/BookmarksDrawer';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { AdminLogin } from './components/admin/AdminLogin';
 import { api } from './utils/api';
-import { generateArticleSchema, generateWebsiteSchema } from './utils/schemaGenerator';
+import { applyHeadMetadata } from './utils/schemaGenerator';
 
 type AuthState = 'checking' | 'authed' | 'anon';
 
@@ -129,36 +129,42 @@ export function App() {
     localStorage.setItem('redwebs_bookmarks', JSON.stringify(bookmarks));
   }, [bookmarks]);
 
-  // Inject Dynamic SEO & Schema JSON-LD into Document Head, driven by the URL
+  // Drives every real SEO/AIO signal in <head> off the current URL: title,
+  // meta description, canonical link, OpenGraph/Twitter tags and JSON-LD.
+  // Article/category pages resolve full metadata via applyHeadMetadata (this
+  // is also what makes the per-article canonical URL, meta description
+  // override and "noindex" toggle in the admin SEO editor actually take
+  // effect on the live site — previously nothing wired them up).
   useEffect(() => {
     if (!settings) return;
-    const existingScript = document.getElementById('dynamic-jsonld-schema');
-    if (existingScript) {
-      existingScript.remove();
-    }
-
-    const script = document.createElement('script');
-    script.id = 'dynamic-jsonld-schema';
-    script.type = 'application/ld+json';
 
     const articleMatch = matchPath('/article/:slug', location.pathname);
     if (articleMatch) {
       const currentArt = articles.find((a) => a.slug === articleMatch.params.slug);
       if (currentArt) {
         const cat = categories.find((c) => c.id === currentArt.categoryId);
-        const schema = generateArticleSchema(currentArt, cat, settings);
-        script.text = JSON.stringify(schema);
-        document.head.appendChild(script);
-
-        document.title = currentArt.seo.metaTitle || `${currentArt.title} | ${settings.siteTitle}`;
+        applyHeadMetadata(currentArt, cat, settings);
         return;
       }
     }
 
-    const homeSchema = generateWebsiteSchema(settings);
-    script.text = JSON.stringify(homeSchema);
-    document.head.appendChild(script);
+    const categoryMatch = matchPath('/category/:slug', location.pathname);
+    if (categoryMatch) {
+      const cat = categories.find((c) => c.slug === categoryMatch.params.slug);
+      if (cat) {
+        const articleCount = articles.filter((a) => a.categoryId === cat.id && a.status === 'published').length;
+        applyHeadMetadata(undefined, cat, settings, articleCount);
+        return;
+      }
+    }
 
+    if (location.pathname === '/') {
+      applyHeadMetadata(undefined, undefined, settings);
+      return;
+    }
+
+    // Admin panel, /toolkit, /categories and unmatched paths: title only —
+    // these routes aren't part of the canonical/OG rollout in this pass.
     if (isAdminRoute) {
       document.title = `پیشخوان مدیریت | ${settings.siteTitle}`;
     } else if (location.pathname === '/toolkit') {
@@ -166,13 +172,7 @@ export function App() {
     } else if (location.pathname === '/categories') {
       document.title = `دسته‌بندی‌های تخصصی آموزش وب و وردپرس | ${settings.siteTitle}`;
     } else {
-      const categoryMatch = matchPath('/category/:slug', location.pathname);
-      if (categoryMatch) {
-        const cat = categories.find((c) => c.slug === categoryMatch.params.slug);
-        document.title = cat ? `${cat.name} | ${settings.siteTitle}` : settings.siteTitle;
-      } else {
-        document.title = `${settings.siteTitle} — ${settings.siteTagline}`;
-      }
+      document.title = `${settings.siteTitle} — ${settings.siteTagline}`;
     }
   }, [location.pathname, articles, categories, settings, isAdminRoute]);
 
