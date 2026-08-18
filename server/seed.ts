@@ -5,6 +5,8 @@ import {
   INITIAL_CATEGORIES,
   INITIAL_COMMENTS,
   INITIAL_SETTINGS,
+  INITIAL_TOOLKIT_CHECKLIST,
+  INITIAL_TOOLKIT_SNIPPETS,
 } from '../src/data/initialData';
 
 export function seedIfEmpty() {
@@ -122,4 +124,34 @@ export function seedIfEmpty() {
 
   seedAll();
   console.log('پایگاه داده با محتوای اولیه ردوبز مقداردهی شد.');
+}
+
+// Toolkit tables are seeded independently of the main content check above so
+// that databases created before the toolkit feature existed still get the
+// default snippets/checklist on first boot after upgrading.
+export function seedToolkitIfEmpty() {
+  const { count } = db.prepare('SELECT COUNT(*) as count FROM toolkit_snippets').get() as { count: number };
+  if (count > 0) return;
+
+  const insertSnippet = db.prepare(`
+    INSERT INTO toolkit_snippets (id, title, category, targetFile, description, code, explanation, sortOrder)
+    VALUES (@id, @title, @category, @targetFile, @description, @code, @explanation, @sortOrder)
+  `);
+
+  const insertChecklistItem = db.prepare(`
+    INSERT INTO toolkit_checklist_items (id, category, title, description, sortOrder)
+    VALUES (@id, @category, @title, @description, @sortOrder)
+  `);
+
+  const seedToolkit = db.transaction(() => {
+    for (const snippet of INITIAL_TOOLKIT_SNIPPETS) {
+      insertSnippet.run(snippet);
+    }
+    for (const item of INITIAL_TOOLKIT_CHECKLIST) {
+      insertChecklistItem.run(item);
+    }
+  });
+
+  seedToolkit();
+  console.log('جعبه ابزار وردپرس با اسنیپت‌ها و چک‌لیست پیش‌فرض مقداردهی شد.');
 }

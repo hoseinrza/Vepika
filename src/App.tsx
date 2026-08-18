@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, Route, Routes, matchPath, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { AdminTab, Article, Category, Comment, SiteSettings, ViewMode } from './types';
+import { AdminTab, Article, Category, Comment, SiteSettings, ToolkitChecklistItem, ToolkitSnippet, ViewMode } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { HomeView } from './components/HomeView';
@@ -67,6 +67,8 @@ export function App() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [toolkitSnippets, setToolkitSnippets] = useState<ToolkitSnippet[]>([]);
+  const [toolkitChecklist, setToolkitChecklist] = useState<ToolkitChecklistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -91,16 +93,21 @@ export function App() {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const [articlesData, categoriesData, commentsData, settingsData] = await Promise.all([
-        api.get('/articles?all=1'),
-        api.get('/categories'),
-        api.get('/comments'),
-        api.get('/settings'),
-      ]);
+      const [articlesData, categoriesData, commentsData, settingsData, toolkitSnippetsData, toolkitChecklistData] =
+        await Promise.all([
+          api.get('/articles?all=1'),
+          api.get('/categories'),
+          api.get('/comments'),
+          api.get('/settings'),
+          api.get('/toolkit/snippets'),
+          api.get('/toolkit/checklist'),
+        ]);
       setArticles(articlesData);
       setCategories(categoriesData);
       setComments(commentsData);
       setSettings(settingsData);
+      setToolkitSnippets(toolkitSnippetsData);
+      setToolkitChecklist(toolkitChecklistData);
     } catch (err: any) {
       setLoadError(err.message || 'خطا در بارگذاری اطلاعات سایت');
     } finally {
@@ -311,6 +318,38 @@ export function App() {
     setCategories(freshCategories);
   };
 
+  const handleSaveToolkitSnippet = async (snippet: ToolkitSnippet) => {
+    const exists = toolkitSnippets.some((s) => s.id === snippet.id);
+    if (exists) {
+      const updated = await api.put(`/toolkit/snippets/${snippet.id}`, snippet);
+      setToolkitSnippets((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+    } else {
+      const created = await api.post('/toolkit/snippets', snippet);
+      setToolkitSnippets((prev) => [...prev, created]);
+    }
+  };
+
+  const handleDeleteToolkitSnippet = async (id: string) => {
+    await api.del(`/toolkit/snippets/${id}`);
+    setToolkitSnippets((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleSaveToolkitChecklistItem = async (item: ToolkitChecklistItem) => {
+    const exists = toolkitChecklist.some((c) => c.id === item.id);
+    if (exists) {
+      const updated = await api.put(`/toolkit/checklist/${item.id}`, item);
+      setToolkitChecklist((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+    } else {
+      const created = await api.post('/toolkit/checklist', item);
+      setToolkitChecklist((prev) => [...prev, created]);
+    }
+  };
+
+  const handleDeleteToolkitChecklistItem = async (id: string) => {
+    await api.del(`/toolkit/checklist/${id}`);
+    setToolkitChecklist((prev) => prev.filter((c) => c.id !== id));
+  };
+
   const handleSaveSettings = async (updated: SiteSettings) => {
     const saved = await api.put('/settings', updated);
     setSettings(saved);
@@ -380,6 +419,8 @@ export function App() {
       categories,
       comments,
       settings,
+      toolkitSnippets,
+      toolkitChecklist,
       currentUser: currentUser!,
       onNavigateTab: handleNavigateTab,
       onExitAdmin: () => navigate('/'),
@@ -397,6 +438,10 @@ export function App() {
       onDeleteCategory: handleDeleteCategory,
       onSaveSettings: handleSaveSettings,
       onImportData: handleImportData,
+      onSaveToolkitSnippet: handleSaveToolkitSnippet,
+      onDeleteToolkitSnippet: handleDeleteToolkitSnippet,
+      onSaveToolkitChecklistItem: handleSaveToolkitChecklistItem,
+      onDeleteToolkitChecklistItem: handleDeleteToolkitChecklistItem,
     };
 
     return (
@@ -420,6 +465,10 @@ export function App() {
         <Route
           path={`${ADMIN_SECRET_PATH}/categories`}
           element={<AdminLayout currentTab="categories" tabParams={null} {...adminLayoutSharedProps} />}
+        />
+        <Route
+          path={`${ADMIN_SECRET_PATH}/toolkit`}
+          element={<AdminLayout currentTab="toolkit" tabParams={null} {...adminLayoutSharedProps} />}
         />
         <Route
           path={`${ADMIN_SECRET_PATH}/seo-settings`}
@@ -534,7 +583,16 @@ export function App() {
             }
           />
 
-          <Route path="/toolkit" element={<WordPressToolkit onBack={() => navigate('/')} />} />
+          <Route
+            path="/toolkit"
+            element={
+              <WordPressToolkit
+                snippets={toolkitSnippets}
+                checklistItems={toolkitChecklist}
+                onBack={() => navigate('/')}
+              />
+            }
+          />
 
           <Route path="*" element={<NotFoundView />} />
         </Routes>

@@ -18,7 +18,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import { AdminTab, Article, Category, Comment, SiteSettings } from '../../types';
+import { AdminTab, Article, Category, Comment, SiteSettings, ToolkitChecklistItem, ToolkitSnippet } from '../../types';
 import { toPersianDigits } from '../../utils/seoAnalyzer';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminArticlesList } from './AdminArticlesList';
@@ -28,6 +28,7 @@ import { AdminCategories } from './AdminCategories';
 import { AdminSeoSettings } from './AdminSeoSettings';
 import { AdminUsers } from './AdminUsers';
 import { AdminProfile } from './AdminProfile';
+import { AdminToolkit } from './AdminToolkit';
 import { RedwebsLogo } from '../RedwebsLogo';
 
 interface AdminLayoutProps {
@@ -37,6 +38,8 @@ interface AdminLayoutProps {
   categories: Category[];
   comments: Comment[];
   settings: SiteSettings;
+  toolkitSnippets: ToolkitSnippet[];
+  toolkitChecklist: ToolkitChecklistItem[];
   currentUser: { username: string; role: 'admin' | 'author' };
   onNavigateTab: (tab: AdminTab, params?: any) => void;
   onExitAdmin: () => void;
@@ -54,6 +57,10 @@ interface AdminLayoutProps {
   onDeleteCategory: (categoryId: string) => Promise<void>;
   onSaveSettings: (settings: SiteSettings) => Promise<void>;
   onImportData: (data: any) => Promise<void>;
+  onSaveToolkitSnippet: (snippet: ToolkitSnippet) => Promise<void>;
+  onDeleteToolkitSnippet: (id: string) => Promise<void>;
+  onSaveToolkitChecklistItem: (item: ToolkitChecklistItem) => Promise<void>;
+  onDeleteToolkitChecklistItem: (id: string) => Promise<void>;
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({
@@ -63,6 +70,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   categories,
   comments,
   settings,
+  toolkitSnippets,
+  toolkitChecklist,
   currentUser,
   onNavigateTab,
   onExitAdmin,
@@ -80,6 +89,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onDeleteCategory,
   onSaveSettings,
   onImportData,
+  onSaveToolkitSnippet,
+  onDeleteToolkitSnippet,
+  onSaveToolkitChecklistItem,
+  onDeleteToolkitChecklistItem,
 }) => {
   const pendingCommentsCount = comments.filter((c) => c.status === 'pending').length;
 
@@ -134,6 +147,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       label: 'دسته‌بندی موضوعی',
       icon: FolderTree,
       badge: toPersianDigits(categories.length),
+    },
+    {
+      id: 'toolkit' as AdminTab,
+      label: 'جعبه ابزار و اسنیپت‌ها',
+      icon: Code,
+      badge: toPersianDigits(toolkitSnippets.length + toolkitChecklist.length),
     },
     {
       id: 'seo-settings' as AdminTab,
@@ -265,7 +284,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
       {/* Main Content Area */}
       <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto max-w-7xl">
-        {!isAdmin && (['comments', 'categories', 'seo-settings', 'users'] as AdminTab[]).includes(currentTab) ? (
+        {!isAdmin && (['comments', 'categories', 'seo-settings', 'users', 'toolkit'] as AdminTab[]).includes(currentTab) ? (
           <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center space-y-2">
             <h2 className="font-lalezar text-xl text-stone-900">این بخش فقط برای مدیر کل قابل دسترسی است</h2>
             <p className="text-xs text-stone-500">حساب کاربری شما به‌عنوان نویسنده، فقط دسترسی به مقالات خودتان دارد.</p>
@@ -345,6 +364,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
         {currentTab === 'users' && <AdminUsers currentUsername={currentUser.username} />}
 
         {currentTab === 'profile' && <AdminProfile />}
+
+        {currentTab === 'toolkit' && (
+          <AdminToolkit
+            snippets={toolkitSnippets}
+            checklistItems={toolkitChecklist}
+            onSaveSnippet={onSaveToolkitSnippet}
+            onDeleteSnippet={onDeleteToolkitSnippet}
+            onSaveChecklistItem={onSaveToolkitChecklistItem}
+            onDeleteChecklistItem={onDeleteToolkitChecklistItem}
+          />
+        )}
           </>
         )}
       </main>

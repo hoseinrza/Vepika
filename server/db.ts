@@ -104,6 +104,25 @@ db.exec(`
     googleSiteVerification TEXT
   );
 
+  CREATE TABLE IF NOT EXISTS toolkit_snippets (
+    id            TEXT PRIMARY KEY,
+    title         TEXT NOT NULL,
+    category      TEXT NOT NULL CHECK (category IN ('security','speed','admin','woocommerce')),
+    targetFile    TEXT NOT NULL CHECK (targetFile IN ('functions.php','.htaccess','wp-config.php')),
+    description   TEXT NOT NULL DEFAULT '',
+    code          TEXT NOT NULL DEFAULT '',
+    explanation   TEXT NOT NULL DEFAULT '',
+    sortOrder     INTEGER NOT NULL DEFAULT 0
+  );
+
+  CREATE TABLE IF NOT EXISTS toolkit_checklist_items (
+    id            TEXT PRIMARY KEY,
+    category      TEXT NOT NULL,
+    title         TEXT NOT NULL,
+    description   TEXT NOT NULL DEFAULT '',
+    sortOrder     INTEGER NOT NULL DEFAULT 0
+  );
+
   CREATE TABLE IF NOT EXISTS admin_users (
     id            TEXT PRIMARY KEY,
     username      TEXT NOT NULL UNIQUE,

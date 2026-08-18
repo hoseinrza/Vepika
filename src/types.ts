@@ -165,7 +165,30 @@ export type AdminTab =
   | 'categories'
   | 'seo-settings'
   | 'users'
-  | 'profile';
+  | 'profile'
+  | 'toolkit';
+
+export type ToolkitSnippetCategory = 'security' | 'speed' | 'admin' | 'woocommerce';
+export type ToolkitTargetFile = 'functions.php' | '.htaccess' | 'wp-config.php';
+
+export interface ToolkitSnippet {
+  id: string;
+  title: string;
+  category: ToolkitSnippetCategory;
+  targetFile: ToolkitTargetFile;
+  description: string;
+  code: string;
+  explanation: string;
+  sortOrder: number;
+}
+
+export interface ToolkitChecklistItem {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  sortOrder: number;
+}
 
 export type AdminRole = 'admin' | 'author';
 

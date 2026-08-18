@@ -1,4 +1,4 @@
-import { Article, Category, Comment, SiteSettings } from '../types';
+import { Article, Category, Comment, SiteSettings, ToolkitChecklistItem, ToolkitSnippet } from '../types';
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
@@ -656,3 +656,189 @@ export const INITIAL_SETTINGS: SiteSettings = {
   instagramUrl: 'https://instagram.com/redwebs_ir',
   youtubeUrl: 'https://youtube.com/@redwebs_ir',
 };
+
+export const INITIAL_TOOLKIT_SNIPPETS: ToolkitSnippet[] = [
+  {
+    id: 'hide-version',
+    title: 'پنهان‌سازی شماره نسخه وردپرس (جلوگیری از اسکن‌های امنیتی)',
+    category: 'security',
+    targetFile: 'functions.php',
+    description: 'حذف متاتگ generator در هدر سایت برای جلوگیری از شناسایی آسیب‌پذیری‌های نسخه توسط ربات‌ها.',
+    code: `// پنهان کردن شماره نسخه وردپرس از سورس کدهای هدر
+remove_action('wp_head', 'wp_generator');
+
+// حذف نسخه وردپرس از آدرس فایل‌های CSS و JS لود شده
+function redwebs_remove_ver_css_js( $src ) {
+    if ( strpos( $src, 'ver=' ) )
+        $src = remove_query_arg( 'ver', $src );
+    return $src;
+}
+add_filter( 'style_loader_src', 'redwebs_remove_ver_css_js', 9999 );
+add_filter( 'script_loader_src', 'redwebs_remove_ver_css_js', 9999 );`,
+    explanation: 'این کد را در انتهای فایل functions.php قالب فعال خود (ترجیحاً چایلدتم) قرار دهید.',
+    sortOrder: 0,
+  },
+  {
+    id: 'disable-xmlrpc',
+    title: 'مسدودسازی کامل درخواست‌های فایل xmlrpc.php',
+    category: 'security',
+    targetFile: '.htaccess',
+    description: 'جلوگیری از حملات Brute Force و DDoS از طریق پروتکل قدیمی XML-RPC.',
+    code: `# مسدودسازی دسترسی به فایل xmlrpc.php
+<Files xmlrpc.php>
+Order Deny,Allow
+Deny from all
+</Files>`,
+    explanation: 'این کد را در بالاترین سطر فایل .htaccess در روت اصلی هاست (public_html) قرار دهید.',
+    sortOrder: 1,
+  },
+  {
+    id: 'disable-file-edit',
+    title: 'غیرفعال‌سازی ویرایشگر فایل‌های پوسته و افزونه از پیشخوان',
+    category: 'security',
+    targetFile: 'wp-config.php',
+    description: 'جلوگیری از تزریق مستقیم کدهای شل و بدافزار در صورت نفوذ به حساب ادمین.',
+    code: `// غیرفعال کردن ویرایشگر فایل‌ها در پیشخوان وردپرس
+define('DISALLOW_FILE_EDIT', true);`,
+    explanation: 'این خط را قبل از عبارت "That\'s all, stop editing! Happy publishing" در wp-config.php درج کنید.',
+    sortOrder: 2,
+  },
+  {
+    id: 'disable-emojis',
+    title: 'حذف اسکریپت‌های سنگین ایموجی پیش‌فرض وردپرس',
+    category: 'speed',
+    targetFile: 'functions.php',
+    description: 'کاهش ۲ ریکوئست اضافه به سرور و کم کردن حجم خروجی HTML برای افزایش چشمگیر سرعت.',
+    code: `// حذف کدهای ایموجی وردپرس برای کاهش ریکوئست و بهینه‌سازی سرعت
+function redwebs_cleanup_wp_emojis() {
+    remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+    remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+    remove_action( 'wp_print_styles', 'print_emoji_styles' );
+    remove_action( 'admin_print_styles', 'print_emoji_styles' );
+    remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+    remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+    remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+}
+add_action( 'init', 'redwebs_cleanup_wp_emojis' );`,
+    explanation: 'با قرار دادن این کد در functions.php دیگر فایل‌های سنگین wp-emoji-release.min.js لود نمی‌شوند.',
+    sortOrder: 3,
+  },
+  {
+    id: 'increase-limits',
+    title: 'افزایش سقف مموری لیمیت و زمان اجرای اسکریپت در وردپرس',
+    category: 'speed',
+    targetFile: 'wp-config.php',
+    description: 'رفع خطای Fatal error: Allowed memory size of xxx bytes exhausted هنگام کار با المنتور و ووکامرس.',
+    code: `// افزایش حافظه مجاز اجرایی PHP برای وردپرس و المنتور
+define('WP_MEMORY_LIMIT', '512M');
+define('WP_MAX_MEMORY_LIMIT', '1024M');`,
+    explanation: 'این مقادیر به وردپرس اجازه می‌دهند تا سقف ۵۱۲ مگابایت از رم هاست برای پردازش‌های سنگین استفاده کند.',
+    sortOrder: 4,
+  },
+  {
+    id: 'custom-admin-login',
+    title: 'تغییر آدرس و تایتل صفحه ورود پیشخوان (wp-login.php)',
+    category: 'admin',
+    targetFile: 'functions.php',
+    description: 'برندسازی صفحه ورود به سایت با لینک وب‌سایت خودتان به جای لوگوی پیش‌فرض وردپرس.',
+    code: `// تغییر لینک لوگوی صفحه ورود به آدرس صفحه اصلی سایت
+add_filter( 'login_headerurl', function() {
+    return home_url();
+} );
+
+// تغییر عنوان هاور لوگوی صفحه ورود
+add_filter( 'login_headertext', function() {
+    return get_bloginfo('name');
+} );`,
+    explanation: 'با این فیلترها، لینک صفحه لاگین به آدرس سایت شما تغییر خواهد یافت.',
+    sortOrder: 5,
+  },
+  {
+    id: 'redirect-https',
+    title: 'ریدایرکت اجباری تمامی صفحات به HTTPS با کد امنیتی .htaccess',
+    category: 'security',
+    targetFile: '.htaccess',
+    description: 'انتقال خودکار کاربران از پروتکل ناامن http به پروتکل امن دارای گواهینامه SSL.',
+    code: `# ریدایرکت خودکار به پروتکل امن HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]`,
+    explanation: 'این کد را در ابتدای فایل .htaccess هاست قرار دهید.',
+    sortOrder: 6,
+  },
+  {
+    id: 'persian-woo-currency',
+    title: 'تغییر متن دکمه خرید در محصولات ناموجود ووکامرس',
+    category: 'woocommerce',
+    targetFile: 'functions.php',
+    description: 'نمایش پیام اطلاع‌رسانی دلخواه روی دکمه محصولات ناموجود در ووکامرس.',
+    code: `// تغییر متن دکمه محصولات ناموجود در ووکامرس
+add_filter( 'woocommerce_product_add_to_cart_text', function( $text, $product ) {
+    if ( ! $product->is_in_stock() ) {
+        return __( 'اطلاع به من هنگام موجودی', 'woocommerce' );
+    }
+    return $text;
+}, 10, 2 );`,
+    explanation: 'این قطعه کد تجربه کاربری مشتریان را هنگام مشاهده محصولات ناموجود بهبود می‌بخشد.',
+    sortOrder: 7,
+  },
+];
+
+export const INITIAL_TOOLKIT_CHECKLIST: ToolkitChecklistItem[] = [
+  {
+    id: 'chk-1',
+    category: 'سئو و پیکربندی',
+    title: 'غیرفعال کردن تیک "نمایش به موتورهای جستجو" در بخش تنظیمات > خواندن',
+    description: 'مطمئن شوید که تیک noindex از روی سایت برداشته شده تا گوگل بتواند صفحات را ایندکس کند.',
+    sortOrder: 0,
+  },
+  {
+    id: 'chk-2',
+    category: 'سئو و پیکربندی',
+    title: 'تنظیم ساختار پیوندهای یکتا روی نام نوشته (Post Name)',
+    description: 'در بخش تنظیمات > پیوندهای یکتا، گزینه /%postname%/ را برای آدرس‌های سئوبیس انتخاب کنید.',
+    sortOrder: 1,
+  },
+  {
+    id: 'chk-3',
+    category: 'سرعت و عملکرد',
+    title: 'فعال‌سازی فشرده‌سازی Gzip و کش سمت مرورگر در .htaccess یا لایت‌اسپید',
+    description: 'فشرده‌سازی کدهای CSS و JS تا ۷۰٪ حجم انتقالی فایل‌ها را کاهش می‌دهد.',
+    sortOrder: 2,
+  },
+  {
+    id: 'chk-4',
+    category: 'سرعت و عملکرد',
+    title: 'تبدیل و بهینه‌سازی فرمت تمامی تصاویر سایت به WebP یا AVIF',
+    description: 'استفاده از فرمت‌های نسل جدید تصاویر برای دستیابی به امتیاز سبز در Google PageSpeed.',
+    sortOrder: 3,
+  },
+  {
+    id: 'chk-5',
+    category: 'امنیت و پشتیبان',
+    title: 'تغییر نام کاربری admin و فعال‌سازی تایید دو مرحله‌ای (2FA)',
+    description: 'جلوگیری از ۹۹٪ حملات جستجوی فراگیر (Brute-force) روی صفحه ورود پیشخوان.',
+    sortOrder: 4,
+  },
+  {
+    id: 'chk-6',
+    category: 'امنیت و پشتیبان',
+    title: 'تنظیم مجوزهای دسترسی امن (Permissions 644 برای فایل‌ها و 755 برای پوشه‌ها)',
+    description: 'تنظیم پرمیشن‌های فایل wp-config.php روی 400 یا 440 جهت جلوگیری از خواندن محتوا.',
+    sortOrder: 5,
+  },
+  {
+    id: 'chk-7',
+    category: 'ابزارها و آمار',
+    title: 'اتصال سایت به Google Search Console و Google Analytics 4',
+    description: 'ثبت سایت‌مپ XML ایجاد شده توسط افزونه سئو در سرچ کنسول گوگل.',
+    sortOrder: 6,
+  },
+  {
+    id: 'chk-8',
+    category: 'امنیت و پشتیبان',
+    title: 'راه‌اندازی پشتیبان‌گیری خودکار هفتگی در فضای ابری (UpdraftPlus یا سرور)',
+    description: 'ارسال خودکار بک‌آپ فایل‌ها و پایگاه داده به Google Drive یا S3 Storage.',
+    sortOrder: 7,
+  },
+];

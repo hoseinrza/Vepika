@@ -1,4 +1,4 @@
-import { Article, Category, Comment, SiteSettings } from '../src/types';
+import { Article, Category, Comment, SiteSettings, ToolkitChecklistItem, ToolkitSnippet } from '../src/types';
 
 export function categoryFromRow(row: any, postCount: number): Category {
   return {
@@ -95,6 +95,29 @@ export function commentFromRow(row: any, replies: any[]): Comment {
           createdAt: r.createdAt,
         }))
       : undefined,
+  };
+}
+
+export function toolkitSnippetFromRow(row: any): ToolkitSnippet {
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    targetFile: row.targetFile,
+    description: row.description,
+    code: row.code,
+    explanation: row.explanation,
+    sortOrder: row.sortOrder,
+  };
+}
+
+export function toolkitChecklistItemFromRow(row: any): ToolkitChecklistItem {
+  return {
+    id: row.id,
+    category: row.category,
+    title: row.title,
+    description: row.description,
+    sortOrder: row.sortOrder,
   };
 }
 

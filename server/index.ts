@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
-import { seedIfEmpty } from './seed';
+import { seedIfEmpty, seedToolkitIfEmpty } from './seed';
 import { bootstrapAdmin } from './auth';
 import { db } from './db';
 import { articleFromRow, categoryFromRow, settingsFromRow } from './mappers';
@@ -20,9 +20,11 @@ import { settingsRouter } from './routes/settings.routes';
 import { backupRouter } from './routes/backup.routes';
 import { seoRouter } from './routes/seo.routes';
 import { geminiRouter } from './routes/gemini.routes';
+import { toolkitRouter } from './routes/toolkit.routes';
 
 async function startServer() {
   seedIfEmpty();
+  seedToolkitIfEmpty();
   bootstrapAdmin();
 
   const app = express();
@@ -43,6 +45,7 @@ async function startServer() {
   app.use('/api/categories', categoriesRouter);
   app.use('/api/comments', commentsRouter);
   app.use('/api/settings', settingsRouter);
+  app.use('/api/toolkit', toolkitRouter);
   app.use('/api/backup', backupRouter);
   app.use('/api/gemini', geminiRouter);
   app.use('/', seoRouter);
